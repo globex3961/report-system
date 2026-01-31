@@ -2734,13 +2734,13 @@
                     if (qrCodeImage) qrCodeImage.style.display = 'none';
                     if (qrCodeText) qrCodeText.style.display = 'none';
                 } else {
-                    // 后续使用，每次1元
-                    paymentMessage.innerHTML = '嗨！感谢你的支持。后续每次导出分析报告需要支付1元费用。请扫描下方二维码完成支付，支付完成后点击"生成分析报告"按钮。';
+                    // 后续使用，每次8.88元
+                    paymentMessage.innerHTML = '嗨！感谢你的支持。后续每次导出分析报告需要支付8.88元费用。请扫描下方二维码完成支付，支付完成后点击"生成分析报告"按钮。';
                     // 显示二维码图片和文本
                     if (qrCodeImage) qrCodeImage.style.display = 'block';
                     if (qrCodeText) {
                         qrCodeText.style.display = 'block';
-                        qrCodeText.textContent = '请扫描二维码完成支付（1元）';
+                        qrCodeText.textContent = '请扫描二维码完成支付（8.88元）';
                     }
                 }
             }
@@ -2760,7 +2760,7 @@
                     updatePaymentPrompt();
                 } else {
                     // 后续使用，需要支付
-                    if (confirm('嗨！感谢你的支持。\n\n请确认您已通过微信支付完成了1元费用的支付。\n\n点击"确定"继续生成报告，点击"取消"返回完成支付。')) {
+                    if (confirm('嗨！感谢你的支持。\n\n请确认您已通过微信支付完成了8.88元费用的支付。\n\n点击"确定"继续生成报告，点击"取消"返回完成支付。')) {
                         generateReport();
                         // 更新使用次数
                         updateUsageCount();
