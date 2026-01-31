@@ -972,58 +972,126 @@
             // 从CSV文件导入学生
             function importStudentsFromFile(file) {
                 var reader = new FileReader();
-                reader.onload = function(e) {
-                    var content = e.target.result;
-                    var rows = content.split('\n');
-                    var tableBody = document.getElementById('students-table-body');
-                    var globalExamItems = document.getElementById('global-exam-items');
-                    if (!tableBody || !globalExamItems) return;
-                    
-                    var globalRows = globalExamItems.querySelectorAll('tr');
-                    
-                    // 清空现有学生行
-                    tableBody.innerHTML = '';
-                    
-                    // 遍历CSV行（跳过表头）
-                    for (var i = 1; i < rows.length; i++) {
-                        var row = rows[i].trim();
-                        if (!row) continue;
+                
+                // 尝试使用多种编码读取文件
+                function tryReadWithEncoding(encoding) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        var content = e.target.result;
                         
-                        var cells = row.split(',');
-                        if (cells.length < 3) continue;
-                        
-                        var name = cells[0];
-                        var dailyScore = parseFloat(cells[1]) || 0;
-                        var examScore = parseFloat(cells[2]) || 0;
-                        
-                        // 创建学生行
-                        var newRow = document.createElement('tr');
-                        rebuildStudentRow(newRow, globalRows);
-                        
-                        // 填充学生数据
-                        var inputs = newRow.querySelectorAll('input');
-                        if (inputs.length >= 3) {
-                            inputs[0].value = name;
-                            inputs[1].value = dailyScore;
-                            inputs[2].value = examScore;
-                            
-                            // 填充题目得分（如果有）
-                            for (var j = 3; j < Math.min(inputs.length, cells.length); j++) {
-                                var score = parseFloat(cells[j]) || 0;
-                                inputs[j].value = score;
-                            }
+                        // 处理不同编码的BOM
+                        if (content.charCodeAt(0) === 0xFEFF) {
+                            // UTF-8 BOM
+                            content = content.substring(1);
+                        } else if (content.charCodeAt(0) === 0xFF && content.charCodeAt(1) === 0xFE) {
+                            // UTF-16 LE BOM
+                            content = content.substring(2);
+                        } else if (content.charCodeAt(0) === 0xFE && content.charCodeAt(1) === 0xFF) {
+                            // UTF-16 BE BOM
+                            content = content.substring(2);
                         }
                         
-                        tableBody.appendChild(newRow);
-                    }
+                        // 处理可能的换行符差异
+                        content = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+                        
+                        var rows = content.split('\n');
+                        var tableBody = document.getElementById('students-table-body');
+                        var globalExamItems = document.getElementById('global-exam-items');
+                        if (!tableBody || !globalExamItems) return;
+                        
+                        var globalRows = globalExamItems.querySelectorAll('tr');
+                        
+                        // 清空现有学生行
+                        tableBody.innerHTML = '';
+                        
+                        // 遍历CSV行（跳过表头）
+                        for (var i = 1; i < rows.length; i++) {
+                            var row = rows[i].trim();
+                            if (!row) continue;
+                            
+                            // 更智能的CSV解析，处理可能的逗号在引号内的情况
+                            var cells = [];
+                            var currentCell = '';
+                            var inQuotes = false;
+                            
+                            for (var j = 0; j < row.length; j++) {
+                                var char = row[j];
+                                
+                                if (char === '"') {
+                                    inQuotes = !inQuotes;
+                                } else if (char === ',' && !inQuotes) {
+                                    cells.push(currentCell.trim());
+                                    currentCell = '';
+                                } else {
+                                    currentCell += char;
+                                }
+                            }
+                            
+                            // 添加最后一个单元格
+                            if (currentCell !== '') {
+                                cells.push(currentCell.trim());
+                            }
+                            
+                            if (cells.length < 3) continue;
+                            
+                            var name = cells[0];
+                            var dailyScore = parseFloat(cells[1]) || 0;
+                            var examScore = parseFloat(cells[2]) || 0;
+                            
+                            // 清理姓名中的可能的特殊字符
+                            name = name.replace(/[\s\u00A0]+/g, ' ').trim();
+                            
+                            // 检查姓名是否可能是乱码（包含大量非ASCII字符但不是有效的中文）
+                            var hasChineseChars = /[\u4e00-\u9fa5]/.test(name);
+                            var hasManySpecialChars = (name.replace(/[\u0000-\u007F\u4e00-\u9fa5]/g, '').length / name.length) > 0.5;
+                            
+                            // 如果使用UTF-8编码但没有中文且有很多特殊字符，可能是编码错误
+                            if (encoding === 'UTF-8' && !hasChineseChars && hasManySpecialChars) {
+                                // 尝试使用GBK编码
+                                tryReadWithEncoding('GBK');
+                                return;
+                            }
+                            
+                            // 创建学生行
+                            var newRow = document.createElement('tr');
+                            rebuildStudentRow(newRow, globalRows);
+                            
+                            // 填充学生数据
+                            var inputs = newRow.querySelectorAll('input');
+                            if (inputs.length >= 3) {
+                                inputs[0].value = name;
+                                inputs[1].value = dailyScore;
+                                inputs[2].value = examScore;
+                                
+                                // 填充题目得分（如果有）
+                                for (var j = 3; j < Math.min(inputs.length, cells.length); j++) {
+                                    var score = parseFloat(cells[j]) || 0;
+                                    inputs[j].value = score;
+                                }
+                            }
+                            
+                            tableBody.appendChild(newRow);
+                        }
+                        
+                        // 重新添加事件监听器
+                        addStudentScoreListeners();
+                        
+                        // 重新计算平均分
+                        calculateAverages();
+                    };
                     
-                    // 重新添加事件监听器
-                    addStudentScoreListeners();
+                    reader.onerror = function() {
+                        // 如果当前编码读取失败，尝试下一种编码
+                        if (encoding === 'UTF-8') {
+                            tryReadWithEncoding('GBK');
+                        }
+                    };
                     
-                    // 重新计算平均分
-                    calculateAverages();
-                };
-                reader.readAsText(file);
+                    reader.readAsText(file, encoding);
+                }
+                
+                // 首先尝试UTF-8编码
+                tryReadWithEncoding('UTF-8');
             }
 
             // 下载学生模板
