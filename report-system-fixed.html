@@ -135,7 +135,10 @@
                 <div id="course-objectives">
                     <!-- 课程目标1 -->
                     <div class="objective-item border border-gray-200 rounded-md p-4 mb-4">
-                        <h4 class="font-medium mb-4">课程目标1</h4>
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="font-medium">课程目标1</h4>
+                            <button class="delete-objective-btn text-red-500 hover:text-red-700 text-sm">删除</button>
+                        </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-gray-700 mb-2">目标描述</label>
@@ -154,7 +157,10 @@
 
                     <!-- 课程目标2 -->
                     <div class="objective-item border border-gray-200 rounded-md p-4 mb-4">
-                        <h4 class="font-medium mb-4">课程目标2</h4>
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="font-medium">课程目标2</h4>
+                            <button class="delete-objective-btn text-red-500 hover:text-red-700 text-sm">删除</button>
+                        </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-gray-700 mb-2">目标描述</label>
@@ -173,7 +179,10 @@
 
                     <!-- 课程目标3 -->
                     <div class="objective-item border border-gray-200 rounded-md p-4 mb-4">
-                        <h4 class="font-medium mb-4">课程目标3</h4>
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="font-medium">课程目标3</h4>
+                            <button class="delete-objective-btn text-red-500 hover:text-red-700 text-sm">删除</button>
+                        </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-gray-700 mb-2">目标描述</label>
@@ -2419,39 +2428,135 @@
             });
 
             // 删除课程目标
-            var deleteButtons = document.querySelectorAll('.delete-objective');
-            for (var i = 0; i < deleteButtons.length; i++) {
-                var button = deleteButtons[i];
-                button.addEventListener('click', function() {
-                    var objectiveItem = this.closest('.objective-item');
-                    objectiveItem.remove();
-                    // 更新目标编号
-                    updateObjectiveNumbers();
-                    // 删除对应权重行
-                    var weightResultsBody = document.getElementById('weight-results');
-                    if (weightResultsBody && weightResultsBody.children.length > 0) {
-                        // 重新计算目标数量，删除多余的权重行
+            function addDeleteObjectiveListeners() {
+                var deleteButtons = document.querySelectorAll('.delete-objective-btn');
+                deleteButtons.forEach(function(button) {
+                    button.addEventListener('click', function() {
+                        var objectiveItem = this.closest('.objective-item');
                         var objectiveCount = document.querySelectorAll('.objective-item').length;
-                        while (weightResultsBody.children.length > objectiveCount) {
-                            weightResultsBody.removeChild(weightResultsBody.lastChild);
+                        
+                        // 确保至少保留2个课程目标
+                        if (objectiveCount <= 2) {
+                            alert('至少需要保留2个课程目标');
+                            return;
                         }
-                    }
+                        
+                        objectiveItem.remove();
+                        // 更新目标编号
+                        updateObjectiveNumbers();
+                        // 删除对应权重行
+                        var weightResultsBody = document.getElementById('weight-results');
+                        if (weightResultsBody && weightResultsBody.children.length > 0) {
+                            // 重新计算目标数量，删除多余的权重行
+                            var newObjectiveCount = document.querySelectorAll('.objective-item').length;
+                            while (weightResultsBody.children.length > newObjectiveCount) {
+                                weightResultsBody.removeChild(weightResultsBody.lastChild);
+                            }
+                        }
 
-                    // 删除对应权重设置部分
-                    var step2Content = document.getElementById('step-2');
-                    if (step2Content) {
-                        // 找到所有课程目标权重设置部分
-                        var objectiveWeightSections = step2Content.querySelectorAll('.mb-8.border.border-gray-200.rounded-md.p-6');
-                        // 重新计算目标数量，删除多余的权重设置部分
-                        var objectiveCount = document.querySelectorAll('.objective-item').length;
-                        while (objectiveWeightSections.length > objectiveCount) {
-                            objectiveWeightSections[objectiveWeightSections.length - 1].remove();
-                            // 重新获取列表，因为DOM已经改变
-                            objectiveWeightSections = step2Content.querySelectorAll('.mb-8.border.border-gray-200.rounded-md.p-6');
+                        // 删除对应权重设置部分
+                        var step2Content = document.getElementById('step-2');
+                        if (step2Content) {
+                            // 找到所有课程目标权重设置部分
+                            var objectiveWeightSections = step2Content.querySelectorAll('.mb-8.border.border-gray-200.rounded-md.p-6');
+                            // 重新计算目标数量，删除多余的权重设置部分
+                            var newObjectiveCount = document.querySelectorAll('.objective-item').length;
+                            while (objectiveWeightSections.length > newObjectiveCount) {
+                                objectiveWeightSections[objectiveWeightSections.length - 1].remove();
+                                // 重新获取列表，因为DOM已经改变
+                                objectiveWeightSections = step2Content.querySelectorAll('.mb-8.border.border-gray-200.rounded-md.p-6');
+                            }
                         }
-                    }
+                    });
                 });
             }
+            
+            // 初始添加删除按钮监听器
+            addDeleteObjectiveListeners();
+            
+            // 为添加课程目标按钮添加事件监听器
+            document.getElementById('add-objective').addEventListener('click', function() {
+                var courseObjectives = document.getElementById('course-objectives');
+                var objectiveCount = courseObjectives.children.length + 1;
+
+                var newObjective = document.createElement('div');
+                newObjective.className = 'objective-item border border-gray-200 rounded-md p-4 mb-4';
+                newObjective.innerHTML = '<div class="flex justify-between items-center mb-4">' +
+                    '<h4 class="font-medium">课程目标' + objectiveCount + '</h4>' +
+                    '<button class="delete-objective-btn text-red-500 hover:text-red-700 text-sm">删除</button>' +
+                '</div>' +
+                '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">' +
+                    '<div>' +
+                        '<label class="block text-gray-700 mb-2">目标描述</label>' +
+                        '<textarea id="objective-' + objectiveCount + '-desc" rows="3" ' +
+                                  'class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus"></textarea>' +
+                    '</div>' +
+                    '<div>' +
+                        '<label class="block text-gray-700 mb-2">对应毕业要求指标点</label>' +
+                        '<input type="text" id="objective-' + objectiveCount + '-requirement" ' +
+                               'class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">' +
+                    '</div>' +
+                '</div>';
+
+                courseObjectives.appendChild(newObjective);
+
+                // 在权重设置部分添加对应的课程目标行
+                var weightResultsBody = document.getElementById('weight-results');
+                if (weightResultsBody) {
+                    var newWeightRow = document.createElement('tr');
+                    newWeightRow.innerHTML = '<td class="px-6 py-4 whitespace-nowrap">课程目标' + objectiveCount + '</td>' +
+                        '<td class="px-6 py-4 whitespace-nowrap"></td>' +
+                        '<td class="px-6 py-4 whitespace-nowrap font-medium text-primary">0.000</td>';
+                    weightResultsBody.appendChild(newWeightRow);
+                }
+
+                // 在权重设置部分添加对应的平时成绩占比和期末成绩题目设置
+                var step2Content = document.getElementById('step-2');
+                if (step2Content) {
+                    // 创建新的课程目标权重设置部分
+                    var newObjectiveWeightSection = document.createElement('div');
+                    newObjectiveWeightSection.className = 'mb-8 border border-gray-200 rounded-md p-6';
+                    newObjectiveWeightSection.innerHTML = '<h3 class="text-lg font-semibold mb-4">课程目标' + objectiveCount + '</h3>' +
+                        '<div class="mb-4">' +
+                            '<label class="block text-gray-700 mb-2">平时成绩占比（%）</label>' +
+                            '<input type="number" id="objective-' + objectiveCount + '-daily-percentage" class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus" value="33" min="0" max="100">' +
+                        '</div>' +
+                        '<div>' +
+                                '<h4 class="font-medium mb-2">期末成绩题目设置</h4>' +
+                                '<div class="flex justify-between items-center mb-2">' +
+                                    '<p class="text-gray-600">请输入期末每一个小题的占比（总分已从期末考试设置中同步）</p>' +
+                                '</div>' +
+                                '<div class="overflow-x-auto">' +
+                                '<table class="min-w-full divide-y divide-gray-200">' +
+                                    '<thead class="bg-gray-50">' +
+                                        '<tr>' +
+                                            '<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">题目</th>' +
+                                            '<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">总分</th>' +
+                                            '<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">占比（%）</th>' +
+                                        '</tr>' +
+                                    '</thead>' +
+                                    '<tbody class="bg-white divide-y divide-gray-200" id="objective-' + objectiveCount + '-exam-items">' +
+                                    '</tbody>' +
+                                '</table>' +
+                            '</div>' +
+                        '</div>';
+                    
+                    // 将新的课程目标权重设置部分添加到步骤2的合适位置（在权重结果表格之前）
+                    var weightResultsTable = document.getElementById('weight-results');
+                    if (weightResultsTable) {
+                        var parentElement = weightResultsTable.closest('div');
+                        if (parentElement) {
+                            parentElement.parentNode.insertBefore(newObjectiveWeightSection, parentElement);
+                        }
+                    }
+                }
+                
+                // 同步所有课程目标的期末成绩题目设置
+                syncAllObjectivesExamItems();
+
+                // 添加删除事件
+                addDeleteObjectiveListeners();
+            });
 
             // 更新目标编号
             function updateObjectiveNumbers() {
@@ -2459,14 +2564,63 @@
                 for (var index = 0; index < objectiveItems.length; index++) {
                     var item = objectiveItems[index];
                     var objectiveNumber = index + 1;
-                    item.querySelector('h4').textContent = '课程目标' + objectiveNumber;
+                    
+                    // 更新标题
+                    var h4 = item.querySelector('h4');
+                    if (h4) {
+                        h4.textContent = '课程目标' + objectiveNumber;
+                    }
                     
                     // 更新表单元素的ID
                     var textareas = item.querySelectorAll('textarea');
-                    if (textareas.length > 0) textareas[0].id = 'objective-' + objectiveNumber + '-desc';
+                    if (textareas.length > 0) {
+                        textareas[0].id = 'objective-' + objectiveNumber + '-desc';
+                    }
                     
                     var inputs = item.querySelectorAll('input');
-                    if (inputs.length > 0) inputs[0].id = 'objective-' + objectiveNumber + '-requirement';
+                    if (inputs.length > 0) {
+                        inputs[0].id = 'objective-' + objectiveNumber + '-requirement';
+                    }
+                }
+                
+                // 更新权重结果表格中的编号
+                var weightResultsBody = document.getElementById('weight-results');
+                if (weightResultsBody) {
+                    var weightRows = weightResultsBody.querySelectorAll('tr');
+                    weightRows.forEach(function(row, index) {
+                        var objectiveNumber = index + 1;
+                        var firstCell = row.querySelector('td:first-child');
+                        if (firstCell) {
+                            firstCell.textContent = '课程目标' + objectiveNumber;
+                        }
+                    });
+                }
+                
+                // 更新步骤2中的课程目标编号
+                var step2Content = document.getElementById('step-2');
+                if (step2Content) {
+                    var objectiveWeightSections = step2Content.querySelectorAll('.mb-8.border.border-gray-200.rounded-md.p-6');
+                    objectiveWeightSections.forEach(function(section, index) {
+                        var objectiveNumber = index + 1;
+                        
+                        // 更新标题
+                        var h3 = section.querySelector('h3');
+                        if (h3) {
+                            h3.textContent = '课程目标' + objectiveNumber;
+                        }
+                        
+                        // 更新输入框ID
+                        var dailyPercentageInput = section.querySelector('input[id^="objective-"]');
+                        if (dailyPercentageInput) {
+                            dailyPercentageInput.id = 'objective-' + objectiveNumber + '-daily-percentage';
+                        }
+                        
+                        // 更新表格ID
+                        var examItemsTable = section.querySelector('tbody[id^="objective-"]');
+                        if (examItemsTable) {
+                            examItemsTable.id = 'objective-' + objectiveNumber + '-exam-items';
+                        }
+                    });
                 }
             }
 
