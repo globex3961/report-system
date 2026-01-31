@@ -1054,8 +1054,9 @@
                 }
                 csvContent += '\n';
                 
-                // 创建Blob对象
-                var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                // 创建Blob对象，添加UTF-8 BOM以确保Windows系统正确识别中文编码
+                var bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+                var blob = new Blob([bom, csvContent], { type: 'text/csv;charset=utf-8;' });
                 var url = URL.createObjectURL(blob);
                 var link = document.createElement('a');
                 link.setAttribute('href', url);
