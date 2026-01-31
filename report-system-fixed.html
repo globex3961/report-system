@@ -2914,7 +2914,7 @@
                         if (wasHidden) {
                             step3Content.classList.add('hidden');
                         }
-                    }, 1000); // 增加到1000ms延迟，确保图表完全渲染
+                    }, 2000); // 增加到2000ms延迟，确保图表完全渲染（包括期望值线）
                 }, 100); // 先等待100ms让DOM更新
             }
 
@@ -3140,7 +3140,7 @@
     <p>本课程有${objectiveCount}个目标，达成采用定量和定性方法来评价，根据支撑毕业要求指标点的强度确定权重，具体计算方法如下：</p>
     <p>考试成绩占${globalExamPercentage}%，平时作业成绩占${globalDailyPercentage}%</p>
     <p>总达成=Σ（目标i达成×目标i的权重），其中i=1到${objectiveCount}</p>
-    <p>其中m为课程考核目标的指标数（${courseName}的考核指标数为${objectiveCount}，即m=${objectiveCount}）；i为1、2、${objectiveCount}。</p>
+    <p>其中m为课程考核目标的指标数（${courseName}的考核指标数为${objectiveCount}，即m=${objectiveCount}）；i为${Array.from({length: objectiveCount}, (_, i) => i + 1).join('、')}。</p>
     <p>目标i达成=目标i成绩÷目标i的总分</p>
     <p>目标i的权重=目标i的总分÷100</p>
     <p>目标i的权重由表1算出分别为：${generateWeightsList()}.</p>
