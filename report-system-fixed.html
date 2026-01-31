@@ -1,0 +1,3375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课程目标达成度分析报告生成系统</title>
+    <!-- Tailwind CSS CDN（外部资源） -->
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <!-- Chart.js CDN（外部资源） -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <!-- 自定义Tailwind配置，设置全局样式 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#64748b',
+                        accent: '#f59e0b',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .form-input-focus {
+                @apply focus:ring-2 focus:ring-primary/50 focus:border-primary;
+            }
+            .card-shadow {
+                @apply shadow-md hover:shadow-lg transition-shadow duration-300;
+            }
+        }
+    </style>
+    <!-- 自定义样式，避免CDN依赖问题 -->
+    <style>
+        /* 自定义样式 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.5;
+        }
+        .step-content.hidden {
+            display: none !important;
+        }
+        table {
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #e5e7eb;
+            padding: 8px;
+        }
+        th {
+            background-color: #f9fafb;
+        }
+        button {
+            cursor: pointer;
+        }
+        textarea, input {
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-primary">课程目标达成度分析报告生成系统</h1>
+            <div class="text-gray-600">
+                <span id="current-date" class="mr-4"></span>
+                <button id="export-report" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors">
+                    导出分析报告
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <!-- 步骤导航栏 -->
+        <div class="flex flex-wrap mb-8 border-b border-gray-200">
+            <button class="step-btn px-6 py-3 font-medium text-primary border-b-2 border-primary" data-step="1">
+                1. 课程信息与目标设置
+            </button>
+            <button class="step-btn px-6 py-3 font-medium text-gray-500 hover:text-primary" data-step="2">
+                2. 权重设置
+            </button>
+            <button class="step-btn px-6 py-3 font-medium text-gray-500 hover:text-primary" data-step="3">
+                3. 学生成绩录入
+            </button>
+            <button class="step-btn px-6 py-3 font-medium text-gray-500 hover:text-primary" data-step="4">
+                4. 课程目标达成分析
+            </button>
+        </div>
+
+        <!-- 步骤1：课程信息与目标设置 -->
+        <div class="step-content" id="step-1">
+            <div class="bg-white rounded-lg p-6 card-shadow mb-8">
+                <h2 class="text-xl font-semibold mb-4">课程基本信息</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-gray-700 mb-2">课程名称</label>
+                        <input type="text" id="course-name" value="《学前儿童健康教育》" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">班级</label>
+                        <input type="text" id="class-name" value="2023级" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">学生人数</label>
+                        <input type="number" id="student-count" value="90" min="1"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">评价人</label>
+                        <input type="text" id="evaluator" value="黎琳"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">专业</label>
+                        <input type="text" id="major" value="学前教育" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">
+                    </div>
+                </div>
+
+                <h3 class="text-lg font-semibold mt-6 mb-4">课程目标设置</h3>
+                <div id="course-objectives">
+                    <!-- 课程目标1 -->
+                    <div class="objective-item border border-gray-200 rounded-md p-4 mb-4">
+                        <h4 class="font-medium mb-4">课程目标1</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 mb-2">目标描述</label>
+                                <textarea id="objective-1-desc" rows="3" 
+                                          class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">通过本课程学习，学生能够系统掌握学前儿童健康教育的自然科学、人文社会科学基础知识，深入理解中华优秀传统文化在健康教育中的渗透方式，熟练掌握幼儿身心发展特点、规律及常见问题应对策略，精准把握幼儿园健康教育的目标、任务与原则，全面熟知幼儿日常保健、疾病预防及意外伤害处理知识，具备扎实的健康、语言、社会、科学、艺术等领域教育基本知识，能够在教育实践中综合运用各领域知识实现活动内容的有效渗透，形成深厚的人文底蕴、科学精神与审美能力，为开展高质量的学前儿童健康教育奠定坚实基础。</textarea>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">对应毕业要求指标点</label>
+                                <input type="text" id="objective-1-requirement" value="毕业要求3：保教知识3.1 3.2 3.3"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <!-- 课程目标2 -->
+                    <div class="objective-item border border-gray-200 rounded-md p-4 mb-4">
+                        <h4 class="font-medium mb-4">课程目标2</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 mb-2">目标描述</label>
+                                <textarea id="objective-2-desc" rows="3" 
+                                          class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">学生能够依据幼儿身心发展规律及学习特点，合理设计与高效利用幼儿身边的活动材料与空间，创设适宜的健康教育环境；熟练掌握设计幼儿生活、游戏、学习及劳动活动计划与方案的方法，具备实施领域整合和融合教育的能力；能够充分挖掘和利用民族文化资源，设计并开展具有特色的幼儿园民族文化健康教育课程；精准观察、深入分析幼儿在园一日生活中的健康行为表现，正确记录、科学分析和客观评价幼儿的游戏、学习行为，有效解决幼儿在健康游戏、学习和生活过程中的实践问题，同时能够对教育行为进行及时评价与深刻反思，熟悉并掌握幼儿园健康教育教研活动的要求、方法和策略。</textarea>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">对应毕业要求指标点</label>
+                                <input type="text" id="objective-2-requirement" value="毕业要求4：保教能力4.1 4.2"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <!-- 课程目标3 -->
+                    <div class="objective-item border border-gray-200 rounded-md p-4 mb-4">
+                        <h4 class="font-medium mb-4">课程目标3</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 mb-2">目标描述</label>
+                                <textarea id="objective-3-desc" rows="3" 
+                                          class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">学生牢固树立幼儿为本、德育为先的健康教育理念，清晰了解幼儿社会性与情感发展规律和个性特征，强化教书育人意识，深刻理解活动育人的价值，能够在健康教育活动中自然融入主流价值；具备较强的心理健康教育意识，熟练掌握幼儿心理健康教育的基本知识与方法，积极参与幼儿心理健康等活动；基于幼儿身心发展特点与学习规律，科学合理设计育人目标、活动主题与内容，充分认识环境、园所文化、一日生活、日常生活劳动等课程资源的育人价值；善于捕捉多种教育契机，对幼儿开展随机健康教育，有效培养幼儿良好的生活习惯与亲社会行为；能够综合协调幼儿园、家庭和社区各种资源，实现高效合作，全面落实育人任务，熟练掌握开展幼儿园、家庭和社区协同健康教育活动的方式方法，顺利开展幼儿园与小学健康习惯培养的衔接工作。</textarea>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">对应毕业要求指标点</label>
+                                <input type="text" id="objective-3-requirement" value="毕业要求6：综合育人6.1 6.2 6.3"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end mt-8 space-x-4">
+                    <button id="add-objective" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors">
+                        添加课程目标
+                    </button>
+                    <button id="to-step-2" class="bg-primary text-white px-6 py-3 rounded-md hover:bg-primary/90 transition-colors">
+                        下一步：权重与达成度设置
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤2：权重与达成度设置 -->
+        <div class="step-content hidden" id="step-2">
+            <div class="bg-white rounded-lg p-6 card-shadow mb-8">
+                <h2 class="text-xl font-semibold mb-4">权重设置</h2>
+                
+                <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
+                    <h3 class="text-lg font-semibold mb-4">全局成绩占比设置</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-gray-700 mb-2">期末成绩总占比（%）</label>
+                            <input type="number" id="global-exam-percentage" class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus" value="60" min="0" max="100">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">平时成绩总占比（%）</label>
+                            <input type="number" id="global-daily-percentage" class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus" value="40" min="0" max="100">
+                        </div>
+                    </div>
+                <p class="mt-2 text-sm text-gray-600">注：期末成绩占比和平时成绩占比之和应为100%</p>
+            </div>
+            
+            <!-- 期末考试设置 -->
+            <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-md">
+                <h3 class="text-lg font-semibold mb-4">期末考试设置</h3>
+                <p class="text-gray-600 mb-4">请设置期末考试每小题的总分，这些设置将用于下面课程目标的计算</p>
+                <div class="flex justify-between items-center mb-2">
+                    <p class="text-gray-600">期末考试题目设置</p>
+                    <button type="button" id="add-exam-question-global" class="text-primary hover:text-primary/80 text-sm">
+                        + 增加题目
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">题目</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">总分</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="global-exam-items">
+                            <tr>
+                                <td class="px-4 py-2"><span class="global-question-name font-medium">第1题</span></td>
+                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md global-question-score" value="5"></td>
+                                <td class="px-4 py-2"><button type="button" class="delete-global-question-btn text-red-500 hover:text-red-600 text-sm">删除</button></td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2"><span class="global-question-name font-medium">第2题</span></td>
+                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md global-question-score" value="5"></td>
+                                <td class="px-4 py-2"><button type="button" class="delete-global-question-btn text-red-500 hover:text-red-600 text-sm">删除</button></td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2"><span class="global-question-name font-medium">第3题</span></td>
+                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md global-question-score" value="10"></td>
+                                <td class="px-4 py-2"><button type="button" class="delete-global-question-btn text-red-500 hover:text-red-600 text-sm">删除</button></td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2"><span class="global-question-name font-medium">第4题</span></td>
+                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md global-question-score" value="35"></td>
+                                <td class="px-4 py-2"><button type="button" class="delete-global-question-btn text-red-500 hover:text-red-600 text-sm">删除</button></td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2"><span class="global-question-name font-medium">第5题</span></td>
+                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md global-question-score" value="5"></td>
+                                <td class="px-4 py-2"><button type="button" class="delete-global-question-btn text-red-500 hover:text-red-600 text-sm">删除</button></td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2"><span class="global-question-name font-medium">第6题</span></td>
+                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md global-question-score" value="40"></td>
+                                <td class="px-4 py-2"><button type="button" class="delete-global-question-btn text-red-500 hover:text-red-600 text-sm">删除</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- 课程目标1 -->
+                <div class="mb-8 border border-gray-200 rounded-md p-6">
+                    <h3 class="text-lg font-semibold mb-4">课程目标1</h3>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2">平时成绩占比（%）</label>
+                        <input type="number" id="objective-1-daily-percentage" class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus" value="50" min="0" max="100">
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium mb-2">期末成绩题目设置</h4>
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="text-gray-600">请输入期末每一个小题的占比（总分已从期末考试设置中同步）</p>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">题目</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">总分</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">占比（%）</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="objective-1-exam-items">
+                                    <tr>
+                                        <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第一题" readonly></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第一题" value="5" readonly></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="80"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第二题" readonly></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第二题" value="5" readonly></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="100"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第三题" readonly></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第三题" value="10" readonly></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="100"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第四题" readonly></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第四题" value="35" readonly></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="57"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第五题" readonly></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第五题" value="5" readonly></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="100"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 课程目标2 -->
+                <div class="mb-8 border border-gray-200 rounded-md p-6">
+                    <h3 class="text-lg font-semibold mb-4">课程目标2</h3>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2">平时成绩占比（%）</label>
+                        <input type="number" id="objective-2-daily-percentage" class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus" value="50" min="0" max="100">
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium mb-2">期末成绩题目设置</h4>
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="text-gray-600">请输入期末每一个小题的占比（总分已从期末考试设置中同步）</p>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">题目</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">总分</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">占比（%）</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="objective-2-exam-items">
+                                    <tr>
+                                        <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第四题" readonly></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第四题" value="35" readonly></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="43"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第六题" readonly></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第六题" value="40" readonly></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="25"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 课程目标3 -->
+                <div class="mb-8 border border-gray-200 rounded-md p-6">
+                    <h3 class="text-lg font-semibold mb-4">课程目标3</h3>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2">平时成绩占比（%）</label>
+                        <input type="number" id="objective-3-daily-percentage" class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus" value="50" min="0" max="100">
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium mb-2">期末成绩题目设置</h4>
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="text-gray-600">请输入期末每一个小题的占比（总分已从期末考试设置中同步）</p>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">题目</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">总分</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">占比（%）</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="objective-3-exam-items">
+                                    <tr>
+                                        <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第一题" readonly></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第一题" value="5" readonly></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="20"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第六题" readonly></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第六题" value="40" readonly></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="75"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="flex justify-center mb-6">
+                    <button id="calculate-weights-btn" class="bg-primary text-white px-6 py-3 rounded-md hover:bg-primary/90 transition-colors">
+                        计算权重
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">课程目标</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">对应毕业要求指标点</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">权重值</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="weight-results">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">课程目标1</td>
+                                <td class="px-6 py-4 whitespace-nowrap">毕业要求4.2[M]</td>
+                                <td class="px-6 py-4 whitespace-nowrap font-medium text-primary">0.325</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">课程目标2</td>
+                                <td class="px-6 py-4 whitespace-nowrap">培养目标6.1[M]</td>
+                                <td class="px-6 py-4 whitespace-nowrap font-medium text-primary">0.35</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">课程目标3</td>
+                                <td class="px-6 py-4 whitespace-nowrap">培养目标8.1[M]</td>
+                                <td class="px-6 py-4 whitespace-nowrap font-medium text-primary">0.325</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex justify-end mt-8">
+                    <button id="back-to-step-1" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors">
+                        返回上一步
+                    </button>
+                    <button id="to-step-3" class="bg-primary text-white px-6 py-3 rounded-md hover:bg-primary/90 transition-colors ml-4">
+                        下一步：学生成绩录入
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤3：学生成绩录入 -->
+        <div class="step-content hidden" id="step-3">
+            <div class="bg-white rounded-lg p-6 card-shadow mb-8">
+                <h2 class="text-xl font-semibold mb-4">学生成绩录入</h2>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-4">成绩录入</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50" id="students-table-header">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">学生姓名</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">平时成绩</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">期末成绩</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="students-table-body">
+                                <!-- 学生行将通过JavaScript动态添加 -->
+                            </tbody>
+                            <tfoot class="bg-gray-50" id="students-table-footer">
+                                <tr>
+                                    <td class="px-4 py-2 font-medium">平均分</td>
+                                    <td class="px-4 py-2"><span class="daily-average">0.0</span></td>
+                                    <td class="px-4 py-2"><span class="exam-average">0.0</span></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="flex justify-between mt-4">
+                        <div class="space-x-4">
+                            <button id="add-student" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors">
+                                添加学生
+                            </button>
+                            <button id="import-students" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors">
+                                导入模版
+                            </button>
+                            <a href="#" id="download-template" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors inline-block">
+                                下载模板
+                            </a>
+                            <input type="file" id="student-file" accept=".csv" class="hidden">
+                        </div>
+                        <div class="space-x-4">
+                            <button id="calculate-averages" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors">
+                                计算平均分
+                            </button>
+                            <button id="calculate-achievements" class="bg-primary text-white px-6 py-3 rounded-md hover:bg-primary/90 transition-colors">
+                                计算达成度
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-4">计算达成度</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50" id="achievements-table-header">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">姓名</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">平时成绩</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">考试成绩</th>
+                                    <!-- 课程目标达成度列将通过JavaScript动态添加 -->
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">总达成度</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="achievements-table-body">
+                                <!-- 学生达成度行将通过JavaScript动态添加 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-4">达成情况图</h3>
+                    <div class="mb-6">
+                    <h4 class="font-medium mb-2">课程目标支撑指标点达成情况</h4>
+                    <div class="w-full h-80">
+                        <canvas id="objectives-chart"></canvas>
+                    </div>
+                    <div class="mt-4 flex justify-center">
+                        <button id="export-objectives-chart" class="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary/90 transition-colors">
+                            导出图
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <h4 class="font-medium mb-2">个体对课程目标达成情况评价图</h4>
+                    <div id="individual-objectives-charts" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- 个体达成情况折线图将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+                </div>
+
+                <div class="flex justify-end mt-8">
+                    <button id="back-to-step-2" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors">
+                        返回上一步
+                    </button>
+                    <button id="to-step-4" class="bg-primary text-white px-6 py-3 rounded-md hover:bg-primary/90 transition-colors ml-4">
+                        下一步：课程目标达成分析
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤4：课程目标达成分析 -->
+        <div class="step-content hidden" id="step-4">
+            <div class="bg-white rounded-lg p-6 card-shadow mb-8">
+                <h2 class="text-xl font-semibold mb-4">课程目标达成分析</h2>
+                
+                <div class="mb-8">
+                    <p class="text-gray-600 mb-6">点击下方按钮生成课程目标达成评价报告，系统将根据之前录入的学生成绩和计算的达成度数据，自动生成完整的分析报告。</p>
+                    
+                    <!-- 支付提示 -->
+                    <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+                        <h4 class="font-medium mb-2 text-yellow-800">付费提示</h4>
+                        <p class="text-yellow-700">嗨！感谢你的支持。我尊重自己的劳动成果，所以导出分析报告需要支付费用。你可以自由决定支付金额。请扫描下方二维码完成支付，支付完成后点击"生成分析报告"按钮。</p>
+                    </div>
+                    
+                    <!-- 微信支付二维码 -->
+                    <div class="flex flex-col items-center mb-6">
+                        <div class="mb-2">
+                            <img src="wechat-pay-qr.jpg" alt="微信支付二维码" class="w-48 h-48 border-2 border-gray-200 p-2">
+                        </div>
+                        <p class="text-sm text-gray-500 mb-4">请扫描二维码完成支付（费用随心）</p>
+                        
+                        <div class="mb-4">
+                            <label class="block text-gray-700 mb-2">报告格式</label>
+                            <select id="report-format" class="px-4 py-2 border border-gray-300 rounded-md form-input-focus">
+                                <option value="html">HTML格式</option>
+                                <option value="word">Word格式</option>
+                            </select>
+                        </div>
+                        <button id="generate-report" class="bg-green-600 text-white px-8 py-4 rounded-md hover:bg-green-700 transition-colors text-lg font-medium">
+                            生成分析报告
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end mt-8">
+                    <button id="back-to-step-3" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors">
+                        返回上一步
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 mt-8">
+        <div class="container mx-auto px-4 py-6 text-center text-gray-600">
+            <p>课程目标达成度分析报告生成系统 © 2024</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 同步学生成绩录入表格的期末考试题目
+            function syncStudentsTableExamItems() {
+                var globalExamItems = document.getElementById('global-exam-items');
+                if (!globalExamItems) return;
+                
+                var tableHeader = document.getElementById('students-table-header');
+                var tableBody = document.getElementById('students-table-body');
+                var tableFooter = document.getElementById('students-table-footer');
+                if (!tableHeader || !tableBody || !tableFooter) return;
+                
+                // 获取现有的表头行和表尾行
+                var headerRow = tableHeader.querySelector('tr');
+                var footerRow = tableFooter.querySelector('tr');
+                if (!headerRow || !footerRow) return;
+                
+                // 清空表头和表尾
+                headerRow.innerHTML = '';
+                footerRow.innerHTML = '';
+                
+                // 添加前三个表头：学生姓名、平时成绩、期末成绩
+                var headers = ['学生姓名', '平时成绩', '期末成绩'];
+                headers.forEach(function(headerText) {
+                    var th = document.createElement('th');
+                    th.className = 'px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
+                    th.textContent = headerText;
+                    headerRow.appendChild(th);
+                });
+                
+                // 添加期末考试题目表头（带总分）
+                var globalRows = globalExamItems.querySelectorAll('tr');
+                globalRows.forEach(function(row) {
+                    var nameSpan = row.querySelector('.global-question-name');
+                    var scoreInput = row.querySelector('.global-question-score');
+                    if (nameSpan && scoreInput) {
+                        var questionName = nameSpan.textContent;
+                        var totalScore = scoreInput.value;
+                        
+                        // 添加表头
+                        var th = document.createElement('th');
+                        th.className = 'px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
+                        th.textContent = questionName + '（总分' + totalScore + '）';
+                        headerRow.appendChild(th);
+                    }
+                });
+                
+                // 添加操作表头
+                var actionTh = document.createElement('th');
+                actionTh.className = 'px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
+                actionTh.textContent = '操作';
+                headerRow.appendChild(actionTh);
+                
+                // 添加前三个表尾单元格：平均分、平时成绩平均分、期末成绩平均分
+                var footerCells = ['平均分', '<span class="daily-average">0.0</span>', '<span class="exam-average">0.0</span>'];
+                footerCells.forEach(function(cellContent, index) {
+                    var td = document.createElement('td');
+                    td.className = 'px-4 py-2';
+                    if (index === 0) {
+                        td.className += ' font-medium';
+                        td.textContent = cellContent;
+                    } else {
+                        td.innerHTML = cellContent;
+                    }
+                    footerRow.appendChild(td);
+                });
+                
+                // 添加期末考试题目表尾平均分单元格
+                globalRows.forEach(function(row) {
+                    var nameSpan = row.querySelector('.global-question-name');
+                    var scoreInput = row.querySelector('.global-question-score');
+                    if (nameSpan && scoreInput) {
+                        var questionName = nameSpan.textContent;
+                        
+                        // 添加表尾平均分单元格
+                        var td = document.createElement('td');
+                        td.className = 'px-4 py-2';
+                        var span = document.createElement('span');
+                        span.className = 'question-average';
+                        span.dataset.question = questionName;
+                        span.textContent = '0.0';
+                        td.appendChild(span);
+                        footerRow.appendChild(td);
+                    }
+                });
+                
+                // 添加操作表尾单元格
+                var actionTd = document.createElement('td');
+                actionTd.className = 'px-4 py-2';
+                footerRow.appendChild(actionTd);
+                
+                // 获取或创建学生行
+                var studentRows = tableBody.querySelectorAll('tr');
+                if (studentRows.length === 0) {
+                    // 如果没有学生行，添加3个默认学生行
+                    for (var i = 0; i < 3; i++) {
+                        addStudentRow(tableBody, globalRows);
+                    }
+                    studentRows = tableBody.querySelectorAll('tr');
+                }
+                
+                // 更新现有学生行
+                studentRows.forEach(function(row) {
+                    // 计算现有输入框数量
+                    var existingInputs = row.querySelectorAll('input');
+                    var existingInputCount = existingInputs.length;
+                    
+                    // 获取全局题目数量
+                    var questionCount = globalRows.length;
+                    
+                    // 如果现有输入框数量不等于需要的数量，重建整个行
+                    if (existingInputCount !== 3 + questionCount) {
+                        rebuildStudentRow(row, globalRows);
+                    }
+                });
+                
+                // 重新添加事件监听器
+                addStudentScoreListeners();
+                
+                // 重新计算平均分
+                calculateAverages();
+            }
+        
+        // 添加学生行
+        function addStudentRow(tableBody, globalRows) {
+            var newRow = document.createElement('tr');
+            rebuildStudentRow(newRow, globalRows);
+            tableBody.appendChild(newRow);
+        }
+        
+        // 重建学生行
+        function rebuildStudentRow(row, globalRows) {
+            row.innerHTML = '';
+            
+            // 添加学生姓名输入框
+            var nameCell = document.createElement('td');
+            nameCell.className = 'px-4 py-2';
+            var nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.className = 'w-full px-3 py-2 border border-gray-300 rounded-md';
+            nameInput.placeholder = '学生姓名';
+            nameCell.appendChild(nameInput);
+            row.appendChild(nameCell);
+            
+            // 添加平时成绩输入框
+            var dailyCell = document.createElement('td');
+            dailyCell.className = 'px-4 py-2';
+            var dailyInput = document.createElement('input');
+            dailyInput.type = 'number';
+            dailyInput.className = 'w-full px-3 py-2 border border-gray-300 rounded-md';
+            dailyInput.min = '0';
+            dailyInput.max = '100';
+            dailyInput.value = '0';
+            dailyCell.appendChild(dailyInput);
+            row.appendChild(dailyCell);
+            
+            // 添加期末成绩输入框
+            var examCell = document.createElement('td');
+            examCell.className = 'px-4 py-2';
+            var examInput = document.createElement('input');
+            examInput.type = 'number';
+            examInput.className = 'w-full px-3 py-2 border border-gray-300 rounded-md';
+            examInput.min = '0';
+            examInput.max = '100';
+            examInput.value = '0';
+            examCell.appendChild(examInput);
+            row.appendChild(examCell);
+            
+            // 添加期末考试题目小分输入框
+            globalRows.forEach(function(globalRow) {
+                var nameSpan = globalRow.querySelector('.global-question-name');
+                var scoreInput = globalRow.querySelector('.global-question-score');
+                if (nameSpan && scoreInput) {
+                    var questionName = nameSpan.textContent;
+                    var totalScore = scoreInput.value;
+                    var td = document.createElement('td');
+                    td.className = 'px-4 py-2';
+                    td.title = questionName + '，总分' + totalScore;
+                    var input = document.createElement('input');
+                    input.type = 'number';
+                    input.className = 'w-full px-3 py-2 border border-gray-300 rounded-md';
+                    input.min = '0';
+                    input.max = totalScore;
+                    input.value = '0';
+                    td.appendChild(input);
+                    row.appendChild(td);
+                }
+            });
+            
+            // 添加删除学生按钮
+            var deleteCell = document.createElement('td');
+            deleteCell.className = 'px-4 py-2';
+            var deleteButton = document.createElement('button');
+            deleteButton.className = 'bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors delete-student';
+            deleteButton.textContent = '删除学生';
+            deleteButton.addEventListener('click', function() {
+                row.remove();
+                calculateAverages();
+            });
+            deleteCell.appendChild(deleteButton);
+            row.appendChild(deleteCell);
+        }
+        
+        // 同步所有课程目标的期末成绩题目设置
+        function syncAllObjectivesExamItems() {
+                var globalExamItems = document.getElementById('global-exam-items');
+                if (!globalExamItems) {
+                    return;
+                }
+                
+                // 获取步骤2的内容
+                var step2Content = document.getElementById('step-2');
+                if (!step2Content) {
+                    return;
+                }
+                
+                // 查找所有课程目标权重设置部分
+                var objectiveSections = step2Content.querySelectorAll('.mb-8.border.border-gray-200.rounded-md.p-6');
+                
+                // 为每个课程目标同步期末成绩题目设置
+                objectiveSections.forEach(function(section) {
+                    // 查找期末成绩题目设置表格
+                    var examItems = section.querySelector('[id$="-exam-items"]');
+                    if (examItems) {
+                        // 清空现有题目
+                        examItems.innerHTML = '';
+                        
+                        // 填充全局期末考试设置中的题目
+                        var globalRows = globalExamItems.querySelectorAll('tr');
+                        globalRows.forEach(function(row) {
+                            var nameSpan = row.querySelector('.global-question-name');
+                            var scoreInput = row.querySelector('.global-question-score');
+                            if (nameSpan && scoreInput) {
+                                var name = nameSpan.textContent;
+                                var score = scoreInput.value;
+                                
+                                var newRow = document.createElement('tr');
+                                newRow.innerHTML = '<td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="' + name + '" readonly></td>' +
+                                    '<td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="' + name + '" value="' + score + '" readonly></td>' +
+                                    '<td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="0"></td>';
+                                examItems.appendChild(newRow);
+                            }
+                        });
+                    }
+                });
+            }
+
+            // 页面加载完成后执行
+            window.onload = function() {
+                // 设置当前日期
+                var currentDateElement = document.getElementById('current-date');
+                var now = new Date();
+                var options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+                currentDateElement.textContent = now.toLocaleDateString('zh-CN', options);
+                
+                // 同步所有课程目标的期末成绩题目设置
+                syncAllObjectivesExamItems();
+                
+                // 初始化第三部分的学生成绩录入表格
+                syncStudentsTableExamItems();
+                
+                // 同步达成度表格的表头
+                syncAchievementsTableHeader();
+                
+                // 为所有输入框添加事件监听器
+                addObjectiveInputListeners();
+                
+                // 为全局成绩占比设置中的输入框添加事件监听器
+                var globalExamPercentage = document.getElementById('global-exam-percentage');
+                var globalDailyPercentage = document.getElementById('global-daily-percentage');
+                if (globalExamPercentage) {
+                    globalExamPercentage.addEventListener('change', function() {
+                        if (typeof window.calculateWeights === 'function') {
+                            window.calculateWeights();
+                        }
+                    });
+                }
+                if (globalDailyPercentage) {
+                    globalDailyPercentage.addEventListener('change', function() {
+                        if (typeof window.calculateWeights === 'function') {
+                            window.calculateWeights();
+                        }
+                    });
+                }
+                
+                // 为现有全局期末考试设置中的分数输入框添加事件监听器
+                document.querySelectorAll('.global-question-score').forEach(function(input) {
+                    input.addEventListener('change', function() {
+                        // 直接调用同步函数，确保所有课程目标都与全局期末考试设置保持一致
+                        syncAllObjectivesExamItems();
+                        // 重新计算权重
+                        if (typeof window.calculateWeights === 'function') {
+                            window.calculateWeights();
+                        }
+                    });
+                });
+                
+                // 为计算达成度按钮添加点击事件监听器
+            var calculateAchievementsBtn = document.getElementById('calculate-achievements');
+            console.log('calculateAchievementsBtn:', calculateAchievementsBtn);
+            if (calculateAchievementsBtn) {
+                calculateAchievementsBtn.addEventListener('click', function() {
+                    console.log('计算达成度按钮被点击');
+                    calculateAchievements();
+                });
+            } else {
+                console.log('未找到计算达成度按钮');
+            }
+            
+            // 为课程目标支撑指标点达成情况图表的导出按钮添加事件监听器
+            var exportObjectivesChartBtn = document.getElementById('export-objectives-chart');
+            if (exportObjectivesChartBtn) {
+                exportObjectivesChartBtn.addEventListener('click', function() {
+                    if (window.objectivesChart) {
+                        exportChart(window.objectivesChart, '课程目标支撑指标点达成情况.png');
+                    }
+                });
+            }
+                
+                // 为导入学生按钮添加点击事件监听器
+                var importStudentsBtn = document.getElementById('import-students');
+                var studentFileInput = document.getElementById('student-file');
+                if (importStudentsBtn && studentFileInput) {
+                    importStudentsBtn.addEventListener('click', function() {
+                        studentFileInput.click();
+                    });
+                    
+                    // 为文件输入添加change事件监听器
+                    studentFileInput.addEventListener('change', function(e) {
+                        var file = e.target.files[0];
+                        if (file) {
+                            importStudentsFromFile(file);
+                        }
+                    });
+                }
+                
+                // 为下载模板按钮添加点击事件监听器
+                var downloadTemplateBtn = document.getElementById('download-template');
+                if (downloadTemplateBtn) {
+                    downloadTemplateBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        downloadStudentTemplate();
+                    });
+                }
+            };
+
+            // 从CSV文件导入学生
+            function importStudentsFromFile(file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var content = e.target.result;
+                    var rows = content.split('\n');
+                    var tableBody = document.getElementById('students-table-body');
+                    var globalExamItems = document.getElementById('global-exam-items');
+                    if (!tableBody || !globalExamItems) return;
+                    
+                    var globalRows = globalExamItems.querySelectorAll('tr');
+                    
+                    // 清空现有学生行
+                    tableBody.innerHTML = '';
+                    
+                    // 遍历CSV行（跳过表头）
+                    for (var i = 1; i < rows.length; i++) {
+                        var row = rows[i].trim();
+                        if (!row) continue;
+                        
+                        var cells = row.split(',');
+                        if (cells.length < 3) continue;
+                        
+                        var name = cells[0];
+                        var dailyScore = parseFloat(cells[1]) || 0;
+                        var examScore = parseFloat(cells[2]) || 0;
+                        
+                        // 创建学生行
+                        var newRow = document.createElement('tr');
+                        rebuildStudentRow(newRow, globalRows);
+                        
+                        // 填充学生数据
+                        var inputs = newRow.querySelectorAll('input');
+                        if (inputs.length >= 3) {
+                            inputs[0].value = name;
+                            inputs[1].value = dailyScore;
+                            inputs[2].value = examScore;
+                            
+                            // 填充题目得分（如果有）
+                            for (var j = 3; j < Math.min(inputs.length, cells.length); j++) {
+                                var score = parseFloat(cells[j]) || 0;
+                                inputs[j].value = score;
+                            }
+                        }
+                        
+                        tableBody.appendChild(newRow);
+                    }
+                    
+                    // 重新添加事件监听器
+                    addStudentScoreListeners();
+                    
+                    // 重新计算平均分
+                    calculateAverages();
+                };
+                reader.readAsText(file);
+            }
+
+            // 下载学生模板
+            function downloadStudentTemplate() {
+                var globalExamItems = document.getElementById('global-exam-items');
+                var questionCount = 0;
+                if (globalExamItems) {
+                    questionCount = globalExamItems.querySelectorAll('tr').length;
+                }
+                
+                // 创建CSV内容
+                var csvContent = '学生姓名,平时成绩,期末成绩';
+                for (var i = 1; i <= questionCount; i++) {
+                    csvContent += ',第' + i + '题得分';
+                }
+                csvContent += '\n';
+                
+                // 添加示例数据
+                csvContent += '张三,85,90';
+                for (var i = 1; i <= questionCount; i++) {
+                    csvContent += ',5';
+                }
+                csvContent += '\n';
+                
+                csvContent += '李四,92,88';
+                for (var i = 1; i <= questionCount; i++) {
+                    csvContent += ',4';
+                }
+                csvContent += '\n';
+                
+                // 创建Blob对象
+                var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                var url = URL.createObjectURL(blob);
+                var link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', '学生成绩模板.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            // 步骤导航
+            var stepButtons = document.getElementsByClassName('step-btn');
+            var stepContents = document.getElementsByClassName('step-content');
+
+            for (var i = 0; i < stepButtons.length; i++) {
+                stepButtons[i].addEventListener('click', function() {
+                    var step = this.getAttribute('data-step');
+                    showStep(step);
+                });
+            }
+
+            // 步骤切换函数
+            function showStep(stepNumber) {
+                // 转换为字符串
+                var stepStr = stepNumber.toString();
+                
+                // 隐藏所有步骤
+                for (var i = 0; i < stepContents.length; i++) {
+                    stepContents[i].classList.add('hidden');
+                }
+
+                // 显示选中的步骤
+                document.getElementById('step-' + stepStr).classList.remove('hidden');
+
+                // 更新步骤按钮样式
+                for (var i = 0; i < stepButtons.length; i++) {
+                    var button = stepButtons[i];
+                    var btnStep = button.getAttribute('data-step');
+                    if (btnStep === stepStr) {
+                        button.classList.add('text-primary', 'border-primary');
+                        button.classList.remove('text-gray-500');
+                    } else {
+                        button.classList.remove('text-primary', 'border-primary');
+                        button.classList.add('text-gray-500');
+                    }
+                }
+
+                // 如果切换到步骤2，计算权重并同步所有课程目标的期末成绩题目设置
+                if (stepStr === '2') {
+                    // 同步所有课程目标的期末成绩题目设置
+                    syncAllObjectivesExamItems();
+                    
+                    // 确保calculateWeights函数已经定义
+                    if (typeof window.calculateWeights === 'function') {
+                        window.calculateWeights();
+                    } else {
+                        console.log('calculateWeights函数尚未定义');
+                    }
+                }
+                
+
+            }
+
+            // 从评价内容中提取权重配置
+            function extractWeightsFromContent(content) {
+                // 使用字符串方法匹配百分比值
+                var weights = [];
+                var startIndex = 0;
+                var openParen, closeParen, percentSign;
+                
+                while ((openParen = content.indexOf('(', startIndex)) !== -1) {
+                    closeParen = content.indexOf(')', openParen);
+                    percentSign = content.indexOf('%', openParen);
+                    
+                    if (closeParen !== -1 && percentSign !== -1 && percentSign < closeParen) {
+                        var numberStr = content.substring(openParen + 1, percentSign);
+                        var number = parseInt(numberStr);
+                        if (!isNaN(number)) {
+                            weights.push(number / 100);
+                        }
+                    }
+                    
+                    startIndex = openParen + 1;
+                }
+
+                return weights;
+            }
+
+            // 验证期末成绩中相同小题的总占比是否为100%
+            function validateExamScores() {
+                // 存储每个小题的总占比
+                var questionPercentages = {};
+                
+                // 遍历所有课程目标的期末成绩表格
+                for (var objectiveNumber = 1; objectiveNumber <= 3; objectiveNumber++) {
+                    var examItemsElement = document.getElementById('objective-' + objectiveNumber + '-exam-items');
+                    if (examItemsElement) {
+                        var examRows = examItemsElement.getElementsByTagName('tr');
+                        for (var i = 0; i < examRows.length; i++) {
+                            var row = examRows[i];
+                            var nameInput = row.querySelector('.question-name');
+                            var inputs = row.getElementsByTagName('input');
+                            var percentageInput = null;
+                            var inputCount = 0;
+                            for (var j = 0; j < inputs.length; j++) {
+                                if (inputs[j].type === 'number') {
+                                    inputCount++;
+                                    if (inputCount === 2) {
+                                        percentageInput = inputs[j];
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            if (nameInput && percentageInput) {
+                                var questionName = nameInput.value.trim();
+                                var percentage = parseInt(percentageInput.value) || 0;
+                                
+                                if (questionName) {
+                                    if (!questionPercentages[questionName]) {
+                                        questionPercentages[questionName] = 0;
+                                    }
+                                    questionPercentages[questionName] += percentage;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // 检查每个小题的总占比是否为100%
+                for (var questionName in questionPercentages) {
+                    if (questionPercentages.hasOwnProperty(questionName)) {
+                        var totalPercentage = questionPercentages[questionName];
+                        if (totalPercentage !== 100) {
+
+                            return false;
+                        }
+                    }
+                }
+                
+                return true;
+            }
+            
+            // 验证平时成绩课程目标占比相加是否为100%
+            function validateDailyScores() {
+                var totalPercentage = 0;
+                
+                // 遍历所有课程目标的平时成绩占比
+                for (var objectiveNumber = 1; objectiveNumber <= 3; objectiveNumber++) {
+                    var dailyPercentageElement = document.getElementById('objective-' + objectiveNumber + '-daily-percentage');
+                    if (dailyPercentageElement) {
+                        var percentage = parseInt(dailyPercentageElement.value) || 0;
+                        totalPercentage += percentage;
+                    }
+                }
+                
+                // 检查总占比是否为100%
+                if (totalPercentage !== 100) {
+
+                    return false;
+                }
+                
+                return true;
+            }
+
+            // 计算权重
+            window.calculateWeights = function() {
+                console.log('calculateWeights 函数被调用');
+                var weightResultsBody = document.getElementById('weight-results');
+                console.log('weightResultsBody:', weightResultsBody);
+                if (!weightResultsBody) {
+                    console.log('weightResultsBody 不存在');
+                    return;
+                }
+                
+                // 清空结果表格，确保每次点击都重新计算
+                weightResultsBody.innerHTML = '';
+
+                // 获取全局成绩占比设置
+                var globalExamPercentageElement = document.getElementById('global-exam-percentage');
+                var globalDailyPercentageElement = document.getElementById('global-daily-percentage');
+                
+                var globalExamPercentage = globalExamPercentageElement ? parseInt(globalExamPercentageElement.value) || 60 : 60;
+                var globalDailyPercentage = globalDailyPercentageElement ? parseInt(globalDailyPercentageElement.value) || 40 : 40;
+                
+                console.log('全局期末成绩占比:', globalExamPercentage);
+                console.log('全局平时成绩占比:', globalDailyPercentage);
+
+                var objectives = [];
+                var objectiveCount = document.querySelectorAll('.objective-item').length; // 动态获取课程目标数量
+                var rawWeights = [];
+                var totalRawWeight = 0;
+
+                for (var objectiveNumber = 1; objectiveNumber <= objectiveCount; objectiveNumber++) {
+                    // 获取对应毕业要求指标点
+                    var requirementElement = document.getElementById('objective-' + objectiveNumber + '-requirement');
+                    var requirement = requirementElement ? requirementElement.value : '课程目标' + objectiveNumber;
+                    
+                    // 获取用户输入的平时成绩占比（百分比值）
+                    var dailyPercentage = 0;
+                    var dailyPercentageElement = document.getElementById('objective-' + objectiveNumber + '-daily-percentage');
+                    if (dailyPercentageElement) {
+                        dailyPercentage = parseInt(dailyPercentageElement.value) || 0;
+                    }
+                    
+                    // 计算目标权重：使用用户要求的公式
+                    // 课程目标权重=（（（课程目标期末成绩题目每一小题分数*占比）*全局成绩期末成绩占比）+（课程目标平时成绩100*占比）*全局平时成绩占比）/100
+                    
+                    // 计算期末题目得分总和：Σ(题目分数×占比/100)
+                    var examTotalScore = 0;
+                    var examItemsElement = document.getElementById('objective-' + objectiveNumber + '-exam-items');
+                    if (examItemsElement) {
+                        var scoreRows = examItemsElement.getElementsByTagName('tr');
+                        for (var k = 0; k < scoreRows.length; k++) {
+                            var row = scoreRows[k];
+                            var scoreInput = row.querySelector('.question-score');
+                            var percentageInput = row.querySelectorAll('input[type="number"]')[1];
+                            
+                            if (scoreInput && percentageInput) {
+                                var score = parseInt(scoreInput.value) || 0;
+                                var percentage = parseInt(percentageInput.value) || 0;
+                                var questionScore = score * (percentage / 100); // 占比转换为小数
+                                examTotalScore += questionScore;
+                                console.log('课程目标' + objectiveNumber + '题目' + (k + 1) + '得分:', questionScore);
+                            }
+                        }
+                    }
+                    console.log('课程目标' + objectiveNumber + '期末题目得分总和:', examTotalScore);
+                    
+                    // 计算平时成绩部分：100×平时成绩占比/100
+                    var dailyScore = 100 * (dailyPercentage / 100); // 100×平时成绩占比/100
+                    console.log('课程目标' + objectiveNumber + '平时成绩得分:', dailyScore);
+                    
+                    // 计算总得分：（期末总得分×全局期末成绩占比） + （平时成绩得分×全局平时成绩占比）
+                    var totalScore = (examTotalScore * (globalExamPercentage / 100)) + (dailyScore * (globalDailyPercentage / 100));
+                    console.log('课程目标' + objectiveNumber + '总得分:', totalScore);
+                    
+                    // 计算权重：总得分÷100
+                    var rawWeight = totalScore / 100;
+                    console.log('课程目标' + objectiveNumber + '计算权重:', rawWeight);
+                    
+                    rawWeights.push(rawWeight);
+                    totalRawWeight += rawWeight;
+                    
+                    // 保存计算结果
+                    objectives.push({ 
+                        rawWeight: rawWeight, 
+                        requirement: requirement
+                    });
+                }
+
+                // 直接使用计算得到的权重，不进行归一化
+                for (var i = 0; i < objectives.length; i++) {
+                    var objective = objectives[i];
+                    var weight = objective.rawWeight;
+                    
+                    // 更新权重值
+                    objective.weight = weight;
+                    delete objective.rawWeight;
+                    
+                    // 更新权重结果表格
+                    var row = document.createElement('tr');
+                    row.innerHTML = '<td class="px-6 py-4 whitespace-nowrap">课程目标' + (i + 1) + '</td><td class="px-6 py-4 whitespace-nowrap">' + objective.requirement + '</td><td class="px-6 py-4 whitespace-nowrap font-medium text-primary">' + weight.toFixed(3) + '</td>';
+                    weightResultsBody.appendChild(row);
+                }
+
+                // 保存计算得到的权重
+                window.calculatedObjectives = objectives;
+                console.log('权重计算完成，结果：', objectives);
+
+            }
+
+            // 步骤导航按钮事件
+            document.getElementById('to-step-2').addEventListener('click', function() {
+                showStep(2);
+            });
+
+
+
+
+            // 全局期末考试设置 - 增加题目按钮事件
+            document.getElementById('add-exam-question-global').addEventListener('click', function() {
+                var tbody = document.getElementById('global-exam-items');
+                var newRow = document.createElement('tr');
+                var rowCount = tbody.children.length;
+                var questionNumber = rowCount + 1;
+                
+                newRow.innerHTML = `
+                    <td class="px-4 py-2"><span class="global-question-name font-medium">第${questionNumber}题</span></td>
+                    <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md global-question-score" value="10"></td>
+                    <td class="px-4 py-2"><button type="button" class="delete-global-question-btn text-red-500 hover:text-red-600 text-sm">删除</button></td>
+                `;
+                
+                tbody.appendChild(newRow);
+                
+                // 为新添加的删除按钮添加事件监听器
+                var deleteBtn = newRow.querySelector('.delete-global-question-btn');
+                deleteBtn.addEventListener('click', function() {
+                    var nameSpan = newRow.querySelector('.global-question-name');
+                    var questionName = nameSpan ? nameSpan.textContent : '';
+                    
+                    // 从所有课程目标中删除相同的题目
+                    var objectiveItems = document.querySelectorAll('[id^="objective-"]');
+                    objectiveItems.forEach(function(item) {
+                        var examItemsId = item.id.replace('-desc', '-exam-items').replace('-requirement', '-exam-items');
+                        var examItems = document.getElementById(examItemsId);
+                        if (examItems) {
+                            var rows = examItems.querySelectorAll('tr');
+                            rows.forEach(function(row) {
+                                var nameInput = row.querySelector('.question-name');
+                                if (nameInput && nameInput.value === questionName) {
+                                    row.remove();
+                                }
+                            });
+                        }
+                    });
+                    
+                    newRow.remove();
+                    
+            // 更新剩余题目的编号
+                    updateQuestionNumbers();
+                    
+                    // 同步更新第三步学生成绩录入表格
+                    syncStudentsTableExamItems();
+                    
+                    // 计算平均分
+                    calculateAverages();
+                });
+                
+                // 为新添加的分数输入框添加事件监听器
+                var scoreInput = newRow.querySelector('.global-question-score');
+                var nameSpan = newRow.querySelector('.global-question-name');
+                
+                // 当分数变更时，更新所有课程目标中的对应题目
+                function updateAllObjectives() {
+                    // 直接调用同步函数，确保所有课程目标都与全局期末考试设置保持一致
+                    syncAllObjectivesExamItems();
+                }
+                
+                // 添加事件监听器
+                scoreInput.addEventListener('change', updateAllObjectives);
+                
+                // 初始化时更新所有课程目标
+                setTimeout(updateAllObjectives, 100);
+            });
+
+            // 更新题目编号的函数
+            function updateQuestionNumbers() {
+                var globalExamItems = document.getElementById('global-exam-items');
+                if (globalExamItems) {
+                    var rows = globalExamItems.querySelectorAll('tr');
+                    rows.forEach(function(row, index) {
+                        var nameSpan = row.querySelector('.global-question-name');
+                        if (nameSpan) {
+                            nameSpan.textContent = `第${index + 1}题`;
+                        }
+                    });
+                }
+            }
+
+            // 全局期末考试设置 - 为现有删除按钮添加事件监听器
+            document.querySelectorAll('.delete-global-question-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var row = this.closest('tr');
+                    var nameSpan = row.querySelector('.global-question-name');
+                    var questionName = nameSpan ? nameSpan.textContent : '';
+                    
+                    // 从所有课程目标中删除相同的题目
+                    var objectiveItems = document.querySelectorAll('[id^="objective-"]');
+                    objectiveItems.forEach(function(item) {
+                        var examItemsId = item.id.replace('-desc', '-exam-items').replace('-requirement', '-exam-items');
+                        var examItems = document.getElementById(examItemsId);
+                        if (examItems) {
+                            var rows = examItems.querySelectorAll('tr');
+                            rows.forEach(function(row) {
+                                var nameInput = row.querySelector('.question-name');
+                                if (nameInput && nameInput.value === questionName) {
+                                    row.remove();
+                                }
+                            });
+                        }
+                    });
+                    
+                    row.remove();
+                    
+                    // 更新剩余题目的编号
+                    updateQuestionNumbers();
+                    
+                    // 同步更新第三步学生成绩录入表格
+                    syncStudentsTableExamItems();
+                    
+                    // 计算平均分
+                    calculateAverages();
+                });
+            });
+
+            // 为每个课程目标的平时成绩占比输入框添加事件监听器
+            function addObjectiveInputListeners() {
+                // 为所有课程目标的平时成绩占比输入框添加事件监听器
+                var dailyPercentageInputs = document.querySelectorAll('[id$="-daily-percentage"]');
+                console.log('找到平时成绩占比输入框数量:', dailyPercentageInputs.length);
+                dailyPercentageInputs.forEach(function(input) {
+                    // 直接添加事件监听器，避免克隆元素
+                    input.addEventListener('input', function() {
+                        console.log('平时成绩占比变化，重新计算权重');
+                        if (typeof window.calculateWeights === 'function') {
+                            window.calculateWeights();
+                        }
+                    });
+                });
+
+                // 为所有课程目标的期末成绩题目占比输入框添加事件监听器
+                var examItemsTables = document.querySelectorAll('[id$="-exam-items"]');
+                console.log('找到期末成绩题目表格数量:', examItemsTables.length);
+                examItemsTables.forEach(function(tableBody) {
+                    var percentageInputs = tableBody.querySelectorAll('input[type="number"]');
+                    console.log('表格中找到输入框数量:', percentageInputs.length);
+                    percentageInputs.forEach(function(input) {
+                        // 跳过只读的分数输入框，只监听占比输入框
+                        if (!input.hasAttribute('readonly')) {
+                            // 直接添加事件监听器，避免克隆元素
+                            input.addEventListener('input', function() {
+                                console.log('期末成绩题目占比变化，重新计算权重');
+                                if (typeof window.calculateWeights === 'function') {
+                                    window.calculateWeights();
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+
+            // 当添加新的课程目标时，也需要为新的输入框添加事件监听器
+            document.getElementById('add-objective').addEventListener('click', function() {
+                // 延迟添加事件监听器，确保DOM已经更新
+                setTimeout(addObjectiveInputListeners, 100);
+            });
+
+            // 为计算权重按钮添加点击事件监听器
+            document.getElementById('calculate-weights-btn').addEventListener('click', function() {
+                console.log('计算权重按钮被点击');
+                if (typeof window.calculateWeights === 'function') {
+                    window.calculateWeights();
+                } else {
+                    console.log('calculateWeights函数尚未定义');
+                }
+            });
+
+            // 步骤导航按钮事件
+            document.getElementById('to-step-3').addEventListener('click', function() {
+                showStep(3);
+            });
+
+            document.getElementById('back-to-step-2').addEventListener('click', function() {
+                showStep(2);
+            });
+
+            // 步骤4导航按钮事件
+            document.getElementById('to-step-4').addEventListener('click', function() {
+                showStep(4);
+            });
+
+            document.getElementById('back-to-step-3').addEventListener('click', function() {
+                showStep(3);
+            });
+
+            // 添加学生
+            document.getElementById('add-student').addEventListener('click', function() {
+                var tableBody = document.getElementById('students-table-body');
+                var globalExamItems = document.getElementById('global-exam-items');
+                if (!tableBody || !globalExamItems) return;
+                
+                var globalRows = globalExamItems.querySelectorAll('tr');
+                addStudentRow(tableBody, globalRows);
+            });
+
+            // 当切换到步骤3时，同步期末考试题目
+            var originalShowStep = showStep;
+            showStep = function(stepNumber) {
+                originalShowStep(stepNumber);
+                
+                if (stepNumber === 3) {
+                    syncStudentsTableExamItems();
+                    syncAchievementsTableHeader();
+                    calculateAverages();
+                    addStudentScoreListeners();
+                }
+            };
+
+            // 同步达成度表格的表头
+            function syncAchievementsTableHeader() {
+                var headerRow = document.querySelector('#achievements-table-header tr');
+                if (!headerRow) return;
+                
+                // 清空表头
+                headerRow.innerHTML = '';
+                
+                // 添加姓名表头
+                var nameTh = document.createElement('th');
+                nameTh.className = 'px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
+                nameTh.textContent = '姓名';
+                headerRow.appendChild(nameTh);
+                
+                // 添加平时成绩表头
+                var dailyTh = document.createElement('th');
+                dailyTh.className = 'px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
+                dailyTh.textContent = '平时成绩';
+                headerRow.appendChild(dailyTh);
+                
+                // 添加考试成绩表头
+                var examTh = document.createElement('th');
+                examTh.className = 'px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
+                examTh.textContent = '考试成绩';
+                headerRow.appendChild(examTh);
+                
+                // 添加课程目标达成度表头
+                var objectiveCount = document.querySelectorAll('.objective-item').length;
+                for (var i = 1; i <= objectiveCount; i++) {
+                    var th = document.createElement('th');
+                    th.className = 'px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
+                    th.textContent = '课程目标' + i + '达成度';
+                    headerRow.appendChild(th);
+                }
+                
+                // 添加总达成度表头
+                var totalTh = document.createElement('th');
+                totalTh.className = 'px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
+                totalTh.textContent = '总达成度';
+                headerRow.appendChild(totalTh);
+            }
+
+
+
+            // 计算达成度
+            function calculateAchievements() {
+                console.log('calculateAchievements 函数被调用');
+                var studentsTableBody = document.getElementById('students-table-body');
+                var achievementsTableBody = document.getElementById('achievements-table-body');
+                console.log('studentsTableBody:', studentsTableBody);
+                console.log('achievementsTableBody:', achievementsTableBody);
+                if (!studentsTableBody || !achievementsTableBody) {
+                    console.log('缺少必要的表格元素');
+                    return;
+                }
+                
+                // 清空达成度表格
+                achievementsTableBody.innerHTML = '';
+                console.log('达成度表格已清空');
+                
+                
+                // 获取课程目标数量
+                var objectiveCount = document.querySelectorAll('.objective-item').length;
+                console.log('课程目标数量:', objectiveCount);
+                
+                // 获取所有学生行
+                var studentRows = studentsTableBody.querySelectorAll('tr');
+                console.log('学生行数量:', studentRows.length);
+                
+                // 初始化总分变量，用于计算平均分
+                var totalDaily = 0;
+                var totalExam = 0;
+                var totalObjectives = new Array(objectiveCount).fill(0);
+                var totalOverall = 0;
+                var studentCount = 0;
+                
+                // 遍历每个学生
+                studentRows.forEach(function(studentRow, index) {
+                    console.log('处理学生行:', index + 1);
+                    
+                    var inputs = studentRow.querySelectorAll('input');
+                    if (inputs.length < 3) return;
+                    
+                    // 获取学生姓名、平时成绩和期末成绩
+                    var name = inputs[0].value || '未命名';
+                    var dailyScore = parseFloat(inputs[1].value) || 0;
+                    var examScore = parseFloat(inputs[2].value) || 0;
+                    
+                    // 创建达成度表格行
+                    var achievementRow = document.createElement('tr');
+                    
+                    // 添加姓名、平时成绩和考试成绩单元格
+                    var nameCell = document.createElement('td');
+                    nameCell.className = 'px-4 py-2';
+                    nameCell.textContent = name;
+                    achievementRow.appendChild(nameCell);
+                    
+                    var dailyCell = document.createElement('td');
+                    dailyCell.className = 'px-4 py-2';
+                    dailyCell.textContent = dailyScore.toFixed(2);
+                    achievementRow.appendChild(dailyCell);
+                    
+                    var examCell = document.createElement('td');
+                    examCell.className = 'px-4 py-2';
+                    examCell.textContent = examScore.toFixed(2);
+                    achievementRow.appendChild(examCell);
+                    
+                    // 计算各课程目标达成度（按照第二步计算权重的方式）
+                    var objectivesAchievements = [];
+                    var totalAchievement = 0;
+                    var totalWeight = 0;
+                    
+                    for (var i = 1; i <= objectiveCount; i++) {
+                        // 获取课程目标的平时成绩占比
+                        var dailyPercentageElement = document.getElementById('objective-' + i + '-daily-percentage');
+                        var dailyPercentage = dailyPercentageElement ? parseFloat(dailyPercentageElement.value) / 100 : 0;
+                        
+                        // 获取全局成绩占比设置
+                        var globalExamPercentageElement = document.getElementById('global-exam-percentage');
+                        var globalDailyPercentageElement = document.getElementById('global-daily-percentage');
+                        var globalExamPercentage = globalExamPercentageElement ? parseFloat(globalExamPercentageElement.value) / 100 : 0.6;
+                        var globalDailyPercentage = globalDailyPercentageElement ? parseFloat(globalDailyPercentageElement.value) / 100 : 0.4;
+                        
+                        // 计算期末题目得分总和：Σ(题目得分×占比/100)
+                        var examTotalScore = 0;
+                        var examItemsElement = document.getElementById('objective-' + i + '-exam-items');
+                        if (examItemsElement) {
+                            var scoreRows = examItemsElement.querySelectorAll('tr');
+                            scoreRows.forEach(function(row) {
+                                var scoreInput = row.querySelector('.question-score');
+                                var percentageInput = row.querySelectorAll('input[type="number"]')[1];
+                                
+                                if (scoreInput && percentageInput) {
+                                    var score = parseFloat(scoreInput.value) || 0;
+                                    var percentage = parseFloat(percentageInput.value) / 100 || 0;
+                                    // 获取学生的对应题目得分
+                                    var questionName = scoreInput.dataset.question;
+                                    var studentQuestionScore = 0;
+                                    
+                                    // 遍历学生输入的题目得分
+                                    var questionInputs = Array.from(inputs).slice(3);
+                                    var globalExamItems = document.getElementById('global-exam-items');
+                                    if (globalExamItems) {
+                                        var globalRows = globalExamItems.querySelectorAll('tr');
+                                        globalRows.forEach(function(globalRow, qIndex) {
+                                            var nameSpan = globalRow.querySelector('.global-question-name');
+                                            if (nameSpan && nameSpan.textContent === questionName && questionInputs[qIndex]) {
+                                                studentQuestionScore = parseFloat(questionInputs[qIndex].value) || 0;
+                                            }
+                                        });
+                                    }
+                                    
+                                    var questionScore = studentQuestionScore * percentage;
+                                    examTotalScore += questionScore;
+                                }
+                            });
+                        }
+                        
+                        // 计算平时成绩部分：100×平时成绩占比/100
+                        var dailyScorePart = dailyScore * dailyPercentage;
+                        
+                        // 计算总得分：（期末总得分×全局期末成绩占比） + （平时成绩得分×全局平时成绩占比）
+                        var totalScore = (examTotalScore * globalExamPercentage) + (dailyScorePart * globalDailyPercentage);
+                        
+                        // 获取课程目标权重
+                        var weight = 1; // 默认权重为1
+                        if (window.calculatedObjectives && window.calculatedObjectives[i-1]) {
+                            weight = window.calculatedObjectives[i-1].weight || 1;
+                        }
+                        
+                        // 计算课程目标达成度：总得分 / (权重×100)
+                        var objectiveAchievement = weight > 0 ? totalScore / (weight * 100) : 0;
+                        
+                        objectivesAchievements.push(objectiveAchievement);
+                        totalAchievement += objectiveAchievement * weight;
+                        totalWeight += weight;
+                        
+                        // 添加课程目标达成度单元格
+                        var objectiveCell = document.createElement('td');
+                        objectiveCell.className = 'px-4 py-2';
+                        objectiveCell.textContent = objectiveAchievement.toFixed(2);
+                        achievementRow.appendChild(objectiveCell);
+                    }
+                    
+                    // 计算总达成度（加权平均）
+                    var weightedAchievement = totalWeight > 0 ? totalAchievement / totalWeight : 0;
+                    
+                    // 添加总达成度单元格
+                    var totalCell = document.createElement('td');
+                    totalCell.className = 'px-4 py-2 font-medium';
+                    totalCell.textContent = weightedAchievement.toFixed(2);
+                    achievementRow.appendChild(totalCell);
+                    
+                    // 添加到达成度表格
+                    achievementsTableBody.appendChild(achievementRow);
+                    
+                    // 累积总分，用于计算平均分
+                    totalDaily += dailyScore;
+                    totalExam += examScore;
+                    objectivesAchievements.forEach(function(achievement, index) {
+                        totalObjectives[index] += achievement;
+                    });
+                    totalOverall += weightedAchievement;
+                    studentCount++;
+                });
+                
+                // 添加平均分行
+                if (studentCount > 0) {
+                    var averageRow = document.createElement('tr');
+                    averageRow.className = 'bg-gray-50 font-medium';
+                    
+                    // 添加姓名单元格（显示"课程目标达成情况"）
+                    var avgNameCell = document.createElement('td');
+                    avgNameCell.className = 'px-4 py-2';
+                    avgNameCell.textContent = '课程目标达成情况';
+                    averageRow.appendChild(avgNameCell);
+                    
+                    // 添加空白单元格（平时成绩和考试成绩的平均分在之前的模块中已经计算过）
+                    var emptyCell1 = document.createElement('td');
+                    emptyCell1.className = 'px-4 py-2';
+                    averageRow.appendChild(emptyCell1);
+                    
+                    var emptyCell2 = document.createElement('td');
+                    emptyCell2.className = 'px-4 py-2';
+                    averageRow.appendChild(emptyCell2);
+                    
+                    // 添加各课程目标达成度平均分单元格
+                    totalObjectives.forEach(function(total, index) {
+                        var avgObjectiveCell = document.createElement('td');
+                        avgObjectiveCell.className = 'px-4 py-2';
+                        avgObjectiveCell.textContent = (total / studentCount).toFixed(2);
+                        averageRow.appendChild(avgObjectiveCell);
+                    });
+                    
+                    // 添加总达成度平均分单元格
+                    var avgOverallCell = document.createElement('td');
+                    avgOverallCell.className = 'px-4 py-2';
+                    avgOverallCell.textContent = (totalOverall / studentCount).toFixed(2);
+                    averageRow.appendChild(avgOverallCell);
+                    
+                    // 添加平均分行到达成度表格
+                    achievementsTableBody.appendChild(averageRow);
+                }
+                
+                // 生成课程目标支撑指标点达成情况图表
+                generateObjectivesChart();
+                
+                // 生成个体对课程目标达成情况评价图
+                generateIndividualObjectivesCharts();
+            }
+
+            // 生成课程目标支撑指标点达成情况图表
+            function generateObjectivesChart() {
+                console.log('generateObjectivesChart 函数被调用');
+                
+                // 确保DOM元素存在
+                var ctx = document.getElementById('objectives-chart');
+                if (!ctx) {
+                    console.log('未找到 objectives-chart 元素');
+                    return;
+                }
+                
+                // 确保Chart.js库已加载
+                if (typeof Chart === 'undefined') {
+                    console.log('Chart.js 库未加载');
+                    return;
+                }
+                
+                // 获取课程目标数量
+                var objectiveCount = document.querySelectorAll('.objective-item').length;
+                if (objectiveCount === 0) {
+                    console.log('课程目标数量为0');
+                    return;
+                }
+                
+                // 计算各课程目标的平均达成度
+                var objectiveAverages = [];
+                var objectiveLabels = [];
+                
+                // 获取达成度表格中的平均行
+                var achievementsTableBody = document.getElementById('achievements-table-body');
+                if (!achievementsTableBody) {
+                    console.log('未找到 achievements-table-body 元素');
+                    return;
+                }
+                
+                var averageRow = achievementsTableBody.querySelector('tr.bg-gray-50');
+                if (!averageRow) {
+                    console.log('未找到平均行');
+                    return;
+                }
+                
+                var cells = averageRow.querySelectorAll('td');
+                if (cells.length < 3 + objectiveCount + 1) {
+                    console.log('单元格数量不足');
+                    return;
+                }
+                
+                // 提取各课程目标的达成度数据
+                for (var i = 3; i < 3 + objectiveCount; i++) {
+                    var achievement = parseFloat(cells[i].textContent) || 0;
+                    objectiveAverages.push(achievement);
+                    objectiveLabels.push('课程目标' + (i - 2));
+                }
+                
+                console.log('课程目标标签:', objectiveLabels);
+                console.log('课程目标达成度:', objectiveAverages);
+                
+                // 生成期望值数据（0.7）
+                var expectationValues = Array(objectiveCount).fill(0.7);
+                
+                // 销毁现有图表（如果存在）
+                if (window.objectivesChart) {
+                    window.objectivesChart.destroy();
+                }
+                
+                // 创建新图表
+                try {
+                    window.objectivesChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: objectiveLabels,
+                            datasets: [{
+                                label: '达成度',
+                                data: objectiveAverages,
+                                backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                                borderColor: 'rgba(59, 130, 246, 1)',
+                                borderWidth: 2
+                            }, {
+                                label: '期望值',
+                                data: expectationValues,
+                                type: 'line',
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 2,
+                                borderDash: [5, 5],
+                                backgroundColor: 'transparent',
+                                pointRadius: 0,
+                                fill: false
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                title: {
+                                    display: false
+                                },
+                                legend: {
+                                    display: true,
+                                    position: 'top'
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.dataset.label + ': ' + context.parsed.y.toFixed(2);
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 1,
+                                    ticks: {
+                                        stepSize: 0.1,
+                                        callback: function(value) {
+                                            return value.toFixed(1);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    console.log('图表创建成功');
+                } catch (error) {
+                    console.error('创建图表时出错:', error);
+                }
+            }
+            
+            // 导出图表为图片
+            function exportChart(chart, filename) {
+                if (!chart) return;
+                
+                try {
+                    // 获取图表的base64图片
+                    var image = chart.toBase64Image('image/png', 1.0);
+                    
+                    // 创建下载链接
+                    var link = document.createElement('a');
+                    link.download = filename;
+                    link.href = image;
+                    link.click();
+                } catch (error) {
+                    console.error('导出图表时出错:', error);
+                }
+            }
+            
+            // 存储个体图表实例
+            window.individualCharts = [];
+            
+            // 生成个体对课程目标达成情况评价图
+            function generateIndividualObjectivesCharts() {
+                console.log('generateIndividualObjectivesCharts 函数被调用');
+                
+                // 确保DOM元素存在
+                var chartsContainer = document.getElementById('individual-objectives-charts');
+                if (!chartsContainer) {
+                    console.log('未找到 individual-objectives-charts 元素');
+                    return;
+                }
+                
+                // 确保Chart.js库已加载
+                if (typeof Chart === 'undefined') {
+                    console.log('Chart.js 库未加载');
+                    return;
+                }
+                
+                // 获取课程目标数量
+                var objectiveCount = document.querySelectorAll('.objective-item').length;
+                if (objectiveCount === 0) {
+                    console.log('课程目标数量为0');
+                    return;
+                }
+                
+                // 获取达成度表格
+                var achievementsTableBody = document.getElementById('achievements-table-body');
+                if (!achievementsTableBody) {
+                    console.log('未找到 achievements-table-body 元素');
+                    return;
+                }
+                
+                // 获取学生行（排除平均行）
+                var studentRows = achievementsTableBody.querySelectorAll('tr:not(.bg-gray-50)');
+                if (studentRows.length === 0) {
+                    console.log('学生行数量为0');
+                    return;
+                }
+                
+                // 收集每个课程目标的学生达成度数据
+                var objectiveAchievements = [];
+                for (var i = 0; i < objectiveCount; i++) {
+                    objectiveAchievements.push([]);
+                }
+                
+                // 遍历每个学生行
+                studentRows.forEach(function(row) {
+                    var cells = row.querySelectorAll('td');
+                    if (cells.length < 3 + objectiveCount + 1) return;
+                    
+                    // 提取每个课程目标的达成度
+                    for (var i = 0; i < objectiveCount; i++) {
+                        var achievement = parseFloat(cells[i + 3].textContent) || 0;
+                        objectiveAchievements[i].push(achievement);
+                    }
+                });
+                
+                // 清空容器
+                chartsContainer.innerHTML = '';
+                
+                // 清空图表实例数组
+                window.individualCharts = [];
+                
+                // 为每个课程目标生成折线图
+                for (var i = 0; i < objectiveCount; i++) {
+                    // 对达成度数据从小到大排序
+                    var sortedAchievements = objectiveAchievements[i].sort(function(a, b) {
+                        return a - b;
+                    });
+                    
+                    // 生成人数作为横坐标
+                    var labels = [];
+                    for (var j = 1; j <= sortedAchievements.length; j++) {
+                        labels.push(j.toString());
+                    }
+                    
+                    // 创建图表容器
+                    var chartWrapper = document.createElement('div');
+                    chartWrapper.className = 'bg-white p-4 rounded-md shadow-sm';
+                    chartWrapper.innerHTML = `
+                        <h5 class="font-medium mb-4">课程目标${i + 1}达成情况</h5>
+                        <div class="w-full h-64">
+                            <canvas id="objective-${i + 1}-chart"></canvas>
+                        </div>
+                        <div class="mt-4 flex justify-center">
+                            <button class="export-individual-chart bg-primary text-white px-6 py-2 rounded-md hover:bg-primary/90 transition-colors" data-objective="${i + 1}">
+                                导出图
+                            </button>
+                        </div>
+                    `;
+                    chartsContainer.appendChild(chartWrapper);
+                }
+                
+                // 等待所有DOM元素创建完成后再创建图表
+                setTimeout(function() {
+                    for (var i = 0; i < objectiveCount; i++) {
+                        // 重新获取排序后的数据
+                        var sortedAchievements = objectiveAchievements[i].sort(function(a, b) {
+                            return a - b;
+                        });
+                        
+                        // 重新生成标签
+                        var labels = [];
+                        for (var j = 1; j <= sortedAchievements.length; j++) {
+                            labels.push(j.toString());
+                        }
+                        
+                        // 获取canvas元素
+                        var canvasId = 'objective-' + (i + 1) + '-chart';
+                        var canvas = document.getElementById(canvasId);
+                        
+                        if (canvas) {
+                            // 确保canvas上下文存在
+                            var ctx = canvas.getContext('2d');
+                            if (ctx) {
+                                try {
+                                    // 销毁现有图表（如果存在）
+                                    if (window['objective' + (i + 1) + 'Chart']) {
+                                        window['objective' + (i + 1) + 'Chart'].destroy();
+                                    }
+                                    
+                                    // 生成期望值数据（0.7）
+                                    var expectationValues = Array(sortedAchievements.length).fill(0.7);
+                                    
+                                    // 创建明确的折线图配置
+                                    var chartConfig = {
+                                        type: 'line', // 明确指定图表类型为折线图
+                                        data: {
+                                            labels: labels, // 确保标签是数组
+                                            datasets: [{
+                                                label: '达成度',
+                                                data: sortedAchievements, // 确保数据是数组
+                                                borderColor: 'rgb(75, 192, 192)',
+                                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                                borderWidth: 2,
+                                                pointRadius: 3,
+                                                pointBackgroundColor: 'rgb(75, 192, 192)',
+                                                pointBorderColor: '#fff',
+                                                pointHoverRadius: 5,
+                                                fill: true,
+                                                tension: 0.1,
+                                                showLine: true // 明确显示线条
+                                            }, {
+                                                label: '期望值',
+                                                data: expectationValues,
+                                                borderColor: 'rgba(255, 99, 132, 1)',
+                                                borderWidth: 2,
+                                                borderDash: [5, 5],
+                                                backgroundColor: 'transparent',
+                                                pointRadius: 0,
+                                                fill: false,
+                                                tension: 0
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: {
+                                                legend: {
+                                                    display: true,
+                                                    position: 'top'
+                                                }
+                                            },
+                                            scales: {
+                                                x: {
+                                                    type: 'category', // 明确指定x轴类型为分类
+                                                    title: {
+                                                        display: true,
+                                                        text: '人数'
+                                                    }
+                                                },
+                                                y: {
+                                                    beginAtZero: true,
+                                                    max: 1,
+                                                    ticks: {
+                                                        stepSize: 0.1
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    };
+                                    
+                                    console.log('创建折线图配置:', chartConfig);
+                                    console.log('数据类型:', typeof sortedAchievements, '数据长度:', sortedAchievements.length);
+                                    console.log('标签类型:', typeof labels, '标签长度:', labels.length);
+                                    
+                                    // 创建图表
+                                    var chart = new Chart(ctx, chartConfig);
+                                    
+                                    // 存储图表实例
+                                    window.individualCharts[i] = chart;
+                                    window['objective' + (i + 1) + 'Chart'] = chart;
+                                    
+                                    console.log('成功创建课程目标' + (i + 1) + '的折线图，图表类型:', chart.config.type);
+                                } catch (error) {
+                                    console.error('创建课程目标' + (i + 1) + '图表时出错:', error);
+                                }
+                            } else {
+                                console.error('无法获取canvas上下文:', canvasId);
+                            }
+                        } else {
+                            console.error('未找到canvas元素:', canvasId);
+                        }
+                    }
+                    
+                    // 添加导出按钮事件监听器
+                    setTimeout(function() {
+                        var buttons = document.querySelectorAll('.export-individual-chart');
+                        console.log('找到导出按钮数量:', buttons.length);
+                        
+                        buttons.forEach(function(button) {
+                            button.addEventListener('click', function() {
+                                var objective = parseInt(this.dataset.objective);
+                                console.log('点击导出按钮，课程目标:', objective);
+                                
+                                if (window.individualCharts && window.individualCharts[objective - 1]) {
+                                    console.log('导出图表，图表类型:', window.individualCharts[objective - 1].config.type);
+                                    exportChart(window.individualCharts[objective - 1], '课程目标' + objective + '达成情况.png');
+                                } else {
+                                    console.error('未找到图表实例:', objective);
+                                }
+                            });
+                        });
+                    }, 100);
+                }, 500); // 确保DOM元素完全创建
+            }
+
+            // 计算平均分
+            function calculateAverages() {
+                console.log('calculateAverages 函数被调用');
+                var tableBody = document.getElementById('students-table-body');
+                var studentRows = tableBody.querySelectorAll('tr');
+                var studentCount = studentRows.length;
+                console.log('学生数量:', studentCount);
+                
+                if (studentCount === 0) {
+                    // 如果没有学生，重置所有平均分
+                    var dailyAverage = document.querySelector('#students-table-footer .daily-average');
+                    var examAverage = document.querySelector('#students-table-footer .exam-average');
+                    var questionAverages = document.querySelectorAll('#students-table-footer .question-average');
+                    
+                    if (dailyAverage) dailyAverage.textContent = '0.0';
+                    if (examAverage) examAverage.textContent = '0.0';
+                    questionAverages.forEach(function(span) {
+                        span.textContent = '0.0';
+                    });
+                    return;
+                }
+                
+                // 初始化总分
+                var totalDaily = 0;
+                var totalExam = 0;
+                var totalQuestions = {};
+                
+                // 遍历所有学生
+                studentRows.forEach(function(row, index) {
+                    var inputs = row.querySelectorAll('input');
+                    console.log('学生行', index + 1, '输入框数量:', inputs.length);
+                    if (inputs.length < 3) return;
+                    
+                    // 计算平时成绩总分
+                    var dailyScore = parseFloat(inputs[1].value) || 0;
+                    totalDaily += dailyScore;
+                    console.log('学生行', index + 1, '平时成绩:', dailyScore);
+                    
+                    // 计算期末成绩总分
+                    var examScore = parseFloat(inputs[2].value) || 0;
+                    totalExam += examScore;
+                    console.log('学生行', index + 1, '期末成绩:', examScore);
+                    
+                    // 计算每个题目的总分
+                    var questionInputs = Array.from(inputs).slice(3);
+                    var globalExamItems = document.getElementById('global-exam-items');
+                    if (globalExamItems) {
+                        var globalRows = globalExamItems.querySelectorAll('tr');
+                        globalRows.forEach(function(globalRow, qIndex) {
+                            var nameSpan = globalRow.querySelector('.global-question-name');
+                            if (nameSpan && questionInputs[qIndex]) {
+                                var questionName = nameSpan.textContent;
+                                var score = parseFloat(questionInputs[qIndex].value) || 0;
+                                if (!totalQuestions[questionName]) {
+                                    totalQuestions[questionName] = 0;
+                                }
+                                totalQuestions[questionName] += score;
+                                console.log('学生行', index + 1, '题目', questionName, '得分:', score);
+                            }
+                        });
+                    }
+                });
+                
+                // 计算平均分
+                var avgDaily = totalDaily / studentCount;
+                var avgExam = totalExam / studentCount;
+                console.log('平时成绩总分:', totalDaily, '平均分:', avgDaily);
+                console.log('期末成绩总分:', totalExam, '平均分:', avgExam);
+                console.log('题目得分:', totalQuestions);
+                
+                // 更新平均分显示
+                var dailyAverage = document.querySelector('#students-table-footer .daily-average');
+                var examAverage = document.querySelector('#students-table-footer .exam-average');
+                var questionAverages = document.querySelectorAll('#students-table-footer .question-average');
+                
+                if (dailyAverage) dailyAverage.textContent = avgDaily.toFixed(1);
+                if (examAverage) examAverage.textContent = avgExam.toFixed(1);
+                
+                // 更新每个题目的平均分
+                questionAverages.forEach(function(span) {
+                    var questionName = span.dataset.question;
+                    console.log('更新题目平均分:', questionName);
+                    if (totalQuestions[questionName]) {
+                        var avgQuestion = totalQuestions[questionName] / studentCount;
+                        span.textContent = avgQuestion.toFixed(1);
+                        console.log('题目', questionName, '总分:', totalQuestions[questionName], '平均分:', avgQuestion);
+                    } else {
+                        span.textContent = '0.0';
+                        console.log('题目', questionName, '无得分，显示0.0');
+                    }
+                });
+            }
+
+            // 为学生成绩输入框添加事件监听器
+            function addStudentScoreListeners() {
+                var tableBody = document.getElementById('students-table-body');
+                var studentRows = tableBody.querySelectorAll('tr');
+                
+                studentRows.forEach(function(row) {
+                    var inputs = row.querySelectorAll('input');
+                    inputs.forEach(function(input, index) {
+                        // 跳过学生姓名输入框（索引0）
+                        if (index === 0) return;
+                        
+                        // 添加输入事件监听器
+                        input.addEventListener('input', function() {
+                            calculateAverages();
+                        });
+                    });
+                });
+            }
+
+            // 为添加学生按钮添加事件监听器
+            var addStudentBtn = document.getElementById('add-student');
+            if (addStudentBtn) {
+                // 移除现有的事件监听器（如果有）
+                var newAddStudentBtn = addStudentBtn.cloneNode(true);
+                addStudentBtn.parentNode.replaceChild(newAddStudentBtn, addStudentBtn);
+                
+                // 添加新的事件监听器
+                newAddStudentBtn.addEventListener('click', function() {
+                    var tableBody = document.getElementById('students-table-body');
+                    var globalExamItems = document.getElementById('global-exam-items');
+                    if (!tableBody || !globalExamItems) return;
+                    
+                    var globalRows = globalExamItems.querySelectorAll('tr');
+                    addStudentRow(tableBody, globalRows);
+                    
+                    // 计算平均分
+                    calculateAverages();
+                    
+                    // 为新添加的学生行添加事件监听器
+                    addStudentScoreListeners();
+                });
+            }
+
+            // 为计算平均分按钮添加点击事件监听器
+            var calculateAveragesBtn = document.getElementById('calculate-averages');
+            if (calculateAveragesBtn) {
+                calculateAveragesBtn.addEventListener('click', function() {
+                    calculateAverages();
+                });
+            }
+
+
+            document.getElementById('back-to-step-1').addEventListener('click', function() {
+                showStep(1);
+            });
+
+
+
+            // 添加课程目标
+            document.getElementById('add-objective').addEventListener('click', function() {
+                var courseObjectives = document.getElementById('course-objectives');
+                var objectiveCount = courseObjectives.children.length + 1;
+
+                var newObjective = document.createElement('div');
+                newObjective.className = 'objective-item border border-gray-200 rounded-md p-4 mb-4';
+                newObjective.innerHTML = '<div class="flex justify-between items-center mb-2">' +
+                    '<h4 class="font-medium">课程目标' + objectiveCount + '</h4>' +
+                    '<button class="text-red-500 hover:text-red-700 delete-objective">删除</button>' +
+                '</div>' +
+                '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">' +
+                    '<div>' +
+                        '<label class="block text-gray-700 mb-2">目标描述</label>' +
+                        '<textarea id="objective-' + objectiveCount + '-desc" rows="3" ' +
+                                  'class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus"></textarea>' +
+                    '</div>' +
+                    '<div>' +
+                        '<label class="block text-gray-700 mb-2">对应毕业要求指标点</label>' +
+                        '<input type="text" id="objective-' + objectiveCount + '-requirement" ' +
+                               'class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">' +
+                    '</div>' +
+                '</div>';
+
+                courseObjectives.appendChild(newObjective);
+
+                // 在权重设置部分添加对应的课程目标行
+                var weightResultsBody = document.getElementById('weight-results');
+                if (weightResultsBody) {
+                    var newWeightRow = document.createElement('tr');
+                    newWeightRow.innerHTML = '<td class="px-6 py-4 whitespace-nowrap">课程目标' + objectiveCount + '</td>' +
+                        '<td class="px-6 py-4 whitespace-nowrap"></td>' +
+                        '<td class="px-6 py-4 whitespace-nowrap font-medium text-primary">0.000</td>';
+                    weightResultsBody.appendChild(newWeightRow);
+                }
+
+                // 在权重设置部分添加对应的平时成绩占比和期末成绩题目设置
+                var step2Content = document.getElementById('step-2');
+                if (step2Content) {
+                    // 创建新的课程目标权重设置部分
+                    var newObjectiveWeightSection = document.createElement('div');
+                    newObjectiveWeightSection.className = 'mb-8 border border-gray-200 rounded-md p-6';
+                    newObjectiveWeightSection.innerHTML = '<h3 class="text-lg font-semibold mb-4">课程目标' + objectiveCount + '</h3>' +
+                        '<div class="mb-4">' +
+                            '<label class="block text-gray-700 mb-2">平时成绩占比（%）</label>' +
+                            '<input type="number" id="objective-' + objectiveCount + '-daily-percentage" class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus" value="33" min="0" max="100">' +
+                        '</div>' +
+                        '<div>' +
+                                '<h4 class="font-medium mb-2">期末成绩题目设置</h4>' +
+                                '<div class="flex justify-between items-center mb-2">' +
+                                    '<p class="text-gray-600">请输入期末每一个小题的占比（总分已从期末考试设置中同步）</p>' +
+                                '</div>' +
+                                '<div class="overflow-x-auto">' +
+                                '<table class="min-w-full divide-y divide-gray-200">' +
+                                    '<thead class="bg-gray-50">' +
+                                        '<tr>' +
+                                            '<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">题目</th>' +
+                                            '<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">总分</th>' +
+                                            '<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">占比（%）</th>' +
+                                        '</tr>' +
+                                    '</thead>' +
+                                    '<tbody class="bg-white divide-y divide-gray-200" id="objective-' + objectiveCount + '-exam-items">' +
+                                    '</tbody>' +
+                                '</table>' +
+                            '</div>' +
+                        '</div>';
+                    
+                    // 将新的课程目标权重设置部分添加到步骤2的合适位置（在权重结果表格之前）
+                    var weightResultsTable = document.getElementById('weight-results');
+                    if (weightResultsTable) {
+                        var parentElement = weightResultsTable.closest('div');
+                        if (parentElement) {
+                            parentElement.parentNode.insertBefore(newObjectiveWeightSection, parentElement);
+                        }
+                    }
+                }
+                
+                // 同步所有课程目标的期末成绩题目设置
+                syncAllObjectivesExamItems();
+
+                // 添加删除事件
+                var deleteButton = newObjective.querySelector('.delete-objective');
+                deleteButton.addEventListener('click', function() {
+                    newObjective.parentNode.removeChild(newObjective);
+                    // 更新目标编号
+                    updateObjectiveNumbers();
+                    // 删除对应权重行
+                    var weightResultsBody = document.getElementById('weight-results');
+                    if (weightResultsBody && weightResultsBody.children.length > 0) {
+                        weightResultsBody.removeChild(weightResultsBody.lastChild);
+                    }
+
+                    // 删除对应权重设置部分
+                    var step2Content = document.getElementById('step-2');
+                    if (step2Content) {
+                        // 找到所有课程目标权重设置部分
+                        var objectiveWeightSections = step2Content.querySelectorAll('.mb-8.border.border-gray-200.rounded-md.p-6');
+                        // 删除最后一个权重设置部分
+                        if (objectiveWeightSections.length > 0) {
+                            objectiveWeightSections[objectiveWeightSections.length - 1].remove();
+                        }
+                    }
+                });
+            });
+
+            // 删除课程目标
+            var deleteButtons = document.querySelectorAll('.delete-objective');
+            for (var i = 0; i < deleteButtons.length; i++) {
+                var button = deleteButtons[i];
+                button.addEventListener('click', function() {
+                    var objectiveItem = this.closest('.objective-item');
+                    objectiveItem.remove();
+                    // 更新目标编号
+                    updateObjectiveNumbers();
+                    // 删除对应权重行
+                    var weightResultsBody = document.getElementById('weight-results');
+                    if (weightResultsBody && weightResultsBody.children.length > 0) {
+                        // 重新计算目标数量，删除多余的权重行
+                        var objectiveCount = document.querySelectorAll('.objective-item').length;
+                        while (weightResultsBody.children.length > objectiveCount) {
+                            weightResultsBody.removeChild(weightResultsBody.lastChild);
+                        }
+                    }
+
+                    // 删除对应权重设置部分
+                    var step2Content = document.getElementById('step-2');
+                    if (step2Content) {
+                        // 找到所有课程目标权重设置部分
+                        var objectiveWeightSections = step2Content.querySelectorAll('.mb-8.border.border-gray-200.rounded-md.p-6');
+                        // 重新计算目标数量，删除多余的权重设置部分
+                        var objectiveCount = document.querySelectorAll('.objective-item').length;
+                        while (objectiveWeightSections.length > objectiveCount) {
+                            objectiveWeightSections[objectiveWeightSections.length - 1].remove();
+                            // 重新获取列表，因为DOM已经改变
+                            objectiveWeightSections = step2Content.querySelectorAll('.mb-8.border.border-gray-200.rounded-md.p-6');
+                        }
+                    }
+                });
+            }
+
+            // 更新目标编号
+            function updateObjectiveNumbers() {
+                var objectiveItems = document.querySelectorAll('.objective-item');
+                for (var index = 0; index < objectiveItems.length; index++) {
+                    var item = objectiveItems[index];
+                    var objectiveNumber = index + 1;
+                    item.querySelector('h4').textContent = '课程目标' + objectiveNumber;
+                    
+                    // 更新表单元素的ID
+                    var textareas = item.querySelectorAll('textarea');
+                    if (textareas.length > 0) textareas[0].id = 'objective-' + objectiveNumber + '-desc';
+                    
+                    var inputs = item.querySelectorAll('input');
+                    if (inputs.length > 0) inputs[0].id = 'objective-' + objectiveNumber + '-requirement';
+                }
+            }
+
+
+            // 为现有全局期末考试设置中的分数输入框添加事件监听器
+            document.querySelectorAll('.global-question-score').forEach(function(input) {
+                input.addEventListener('change', function() {
+                    // 直接调用同步函数，确保所有课程目标都与全局期末考试设置保持一致
+                    syncAllObjectivesExamItems();
+                });
+            });
+
+            // 为生成报告按钮添加事件监听器
+            document.getElementById('generate-report').addEventListener('click', function() {
+                console.log('生成报告按钮被点击');
+                // 添加支付确认
+                if (confirm('嗨！感谢你的支持。\n\n请确认您已通过微信支付完成了费用的支付（金额由你自由决定）。\n\n点击"确定"继续生成报告，点击"取消"返回完成支付。')) {
+                    generateReport();
+                }
+            });
+
+            // 计算达成度统计数据
+            function calculateAchievementStats(overallAchievements, objectiveAchievements) {
+                console.log('calculateAchievementStats 函数被调用');
+                // 计算总达成度统计
+                var totalSum = overallAchievements.reduce(function(sum, val) { return sum + val; }, 0);
+                var totalAverage = overallAchievements.length > 0 ? totalSum / overallAchievements.length : 0;
+                var passCount = overallAchievements.filter(function(val) { return val >= 0.6; }).length;
+                var excellentCount = overallAchievements.filter(function(val) { return val >= 0.8; }).length;
+                var passRate = overallAchievements.length > 0 ? (passCount / overallAchievements.length) * 100 : 0;
+                var excellentRate = overallAchievements.length > 0 ? (excellentCount / overallAchievements.length) * 100 : 0;
+                
+                // 计算各课程目标统计
+                var objectiveStats = [];
+                objectiveAchievements.forEach(function(achievements, index) {
+                    var sum = achievements.reduce(function(s, val) { return s + val; }, 0);
+                    var average = achievements.length > 0 ? sum / achievements.length : 0;
+                    var objPassCount = achievements.filter(function(val) { return val >= 0.6; }).length;
+                    var objExcellentCount = achievements.filter(function(val) { return val >= 0.8; }).length;
+                    var objPassRate = achievements.length > 0 ? (objPassCount / achievements.length) * 100 : 0;
+                    var objExcellentRate = achievements.length > 0 ? (objExcellentCount / achievements.length) * 100 : 0;
+                    
+                    objectiveStats.push({
+                        index: index,
+                        average: average,
+                        passRate: objPassRate,
+                        excellentRate: objExcellentRate,
+                        achievements: achievements
+                    });
+                });
+                
+                return {
+                    totalAverage: totalAverage,
+                    passRate: passRate,
+                    excellentRate: excellentRate,
+                    objectiveStats: objectiveStats,
+                    overallAchievements: overallAchievements
+                };
+            }
+
+            // 生成课程目标达成评价报告
+            function generateReport() {
+                console.log('generateReport 函数被调用');
+                
+                // 临时显示步骤3的内容，确保图表可以渲染
+                var step3Content = document.getElementById('step-3');
+                var wasHidden = step3Content.classList.contains('hidden');
+                if (wasHidden) {
+                    step3Content.classList.remove('hidden');
+                }
+                
+                // 强制重新渲染图表，确保图表实例存在
+                setTimeout(function() {
+                    console.log('重新渲染图表');
+                    // 重新计算达成度，这会重新生成所有图表
+                    calculateAchievements();
+                    
+                    // 等待更长时间，确保图表完全渲染
+                    setTimeout(function() {
+                        // 获取课程信息
+                        var courseName = document.getElementById('course-name').value || '课程名称';
+                        var className = document.getElementById('class-name').value || '班级';
+                        var studentCount = document.getElementById('student-count').value || '0';
+                        var evaluator = document.getElementById('evaluator').value || '评价人';
+                        var major = document.getElementById('major').value || '专业';
+                        
+                        // 获取达成度数据
+                        var achievementsTableBody = document.getElementById('achievements-table-body');
+                        if (!achievementsTableBody) {
+                            alert('请先在第三步计算达成度');
+                            // 恢复隐藏状态
+                            if (wasHidden) {
+                                step3Content.classList.add('hidden');
+                            }
+                            return;
+                        }
+                        
+                        var studentRows = achievementsTableBody.querySelectorAll('tr:not(.bg-gray-50)');
+                        if (studentRows.length === 0) {
+                            alert('请先在第三步输入学生成绩并计算达成度');
+                            // 恢复隐藏状态
+                            if (wasHidden) {
+                                step3Content.classList.add('hidden');
+                            }
+                            return;
+                        }
+                        
+                        // 获取课程目标数量
+                        var objectiveCount = document.querySelectorAll('.objective-item').length;
+                        if (objectiveCount === 0) {
+                            alert('请先在第一步设置课程目标');
+                            // 恢复隐藏状态
+                            if (wasHidden) {
+                                step3Content.classList.add('hidden');
+                            }
+                            return;
+                        }
+                        
+                        // 收集数据
+                        var overallAchievements = [];
+                        var objectiveAchievements = [];
+                        for (var i = 0; i < objectiveCount; i++) {
+                            objectiveAchievements.push([]);
+                        }
+                        
+                        // 遍历每个学生行
+                        studentRows.forEach(function(row) {
+                            var cells = row.querySelectorAll('td');
+                            if (cells.length < 3 + objectiveCount + 1) return;
+                            
+                            // 提取总达成度
+                            var overallAchievement = parseFloat(cells[3 + objectiveCount].textContent) || 0;
+                            overallAchievements.push(overallAchievement);
+                            
+                            // 提取每个课程目标的达成度
+                            for (var i = 0; i < objectiveCount; i++) {
+                                var achievement = parseFloat(cells[i + 3].textContent) || 0;
+                                objectiveAchievements[i].push(achievement);
+                            }
+                        });
+                        
+                        // 计算统计数据
+                        var stats = calculateAchievementStats(overallAchievements, objectiveAchievements);
+                        console.log('统计数据计算完成:', stats);
+                        
+                        // 获取用户选择的报告格式
+                        var reportFormat = document.getElementById('report-format').value || 'html';
+                        
+                        // 生成报告内容
+                        var actualStudentCount = studentRows.length;
+                        var reportContent = generateReportContent(courseName, className, studentCount, evaluator, major, stats, objectiveCount, actualStudentCount);
+                        console.log('报告内容生成完成');
+                        
+                        // 创建并下载报告文件
+                        var filename = courseName + '课程目标达成评价报告.' + (reportFormat === 'word' ? 'docx' : 'html');
+                        downloadReport(reportContent, filename, reportFormat);
+                        console.log('报告下载完成');
+                        
+                        // 恢复隐藏状态
+                        if (wasHidden) {
+                            step3Content.classList.add('hidden');
+                        }
+                    }, 1000); // 增加到1000ms延迟，确保图表完全渲染
+                }, 100); // 先等待100ms让DOM更新
+            }
+
+            // 生成报告内容
+            function generateReportContent(courseName, className, studentCount, evaluator, major, stats, objectiveCount, actualStudentCount) {
+                var currentDate = new Date().toLocaleDateString('zh-CN', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                // 获取全局成绩占比设置
+                var globalExamPercentageElement = document.getElementById('global-exam-percentage');
+                var globalDailyPercentageElement = document.getElementById('global-daily-percentage');
+                var globalExamPercentage = globalExamPercentageElement ? globalExamPercentageElement.value : '60';
+                var globalDailyPercentage = globalDailyPercentageElement ? globalDailyPercentageElement.value : '40';
+                
+                // 如果没有提供实际学生人数，使用学生行数量
+                if (!actualStudentCount) {
+                    actualStudentCount = stats.overallAchievements.length;
+                }
+                
+                // 计算各课程目标的达成度
+                var objectiveValues = [];
+                stats.objectiveStats.forEach(function(objStat) {
+                    objectiveValues.push(objStat.average.toFixed(2));
+                });
+                
+                var overallValue = stats.totalAverage.toFixed(2);
+                
+                // 生成课程目标与毕业要求矩阵关系表
+                var matrixTable = generateMatrixTable(objectiveCount);
+                
+                // 生成课程教学目标达成评价表
+                var evaluationTable = generateEvaluationTable(objectiveCount, objectiveValues);
+                
+                // 生成存在的问题及整改措施
+                var problemsAndSolutions = generateProblemsAndSolutions(stats);
+                
+                // 生成图表HTML
+                var objectivesChartHtml = '';
+                if (window.objectivesChart) {
+                    console.log('获取课程目标图表');
+                    try {
+                        var objectivesChartImage = window.objectivesChart.toBase64Image('image/png', 1.0);
+                        console.log('成功获取课程目标图表base64');
+                        objectivesChartHtml = `
+                        <div class="text-center my-6" style="width: 100%; max-width: 600px; margin: 0 auto;">
+                            <h5>图2-1 课程目标支撑指标点达成情况</h5>
+                            <img src="${objectivesChartImage}" alt="课程目标支撑指标点达成情况" style="width: 100%; height: auto; display: block; margin: 0 auto; page-break-inside: avoid;">
+                        </div>
+                        `;
+                    } catch (error) {
+                        console.error('获取课程目标图表失败:', error);
+                        objectivesChartHtml = '<p>图表加载失败</p>';
+                    }
+                } else {
+                    console.log('课程目标图表实例不存在');
+                }
+                
+                // 生成个体图表HTML
+                var individualChartsHtml = '';
+                if (window.individualCharts && window.individualCharts.length > 0) {
+                    console.log('获取个体图表，数量:', window.individualCharts.length);
+                    window.individualCharts.forEach(function(chart, index) {
+                        if (chart) {
+                            try {
+                                var individualChartImage = chart.toBase64Image('image/png', 1.0);
+                                console.log('成功获取课程目标', index + 1, '图表base64');
+                                individualChartsHtml += `
+                                <div class="text-center my-6" style="width: 100%; max-width: 600px; margin: 0 auto;">
+                                    <h5>图2-2-${index + 1} 课程目标${index + 1}达成情况</h5>
+                                    <img src="${individualChartImage}" alt="课程目标${index + 1}达成情况" style="width: 100%; height: auto; display: block; margin: 0 auto; page-break-inside: avoid;">
+                                </div>
+                                `;
+                            } catch (error) {
+                                console.error('获取课程目标', index + 1, '图表失败:', error);
+                                individualChartsHtml += `<p>课程目标${index + 1}图表加载失败</p>`;
+                            }
+                        } else {
+                            console.log('课程目标', index + 1, '图表实例不存在');
+                        }
+                    });
+                } else {
+                    console.log('个体图表实例不存在');
+                }
+                
+                // 报告模板
+                var reportTemplate = `
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${courseName}课程目标达成评价报告</title>
+    <style>
+        * {
+            font-family: "SimSun", "宋体", serif;
+            line-height: 1.5;
+            color: #000;
+        }
+        body {
+            font-size: 12pt;
+            margin: 20px;
+            text-indent: 0;
+        }
+        h1 {
+            font-size: 15pt;
+            text-align: center;
+            margin: 0;
+        }
+        h2 {
+            font-size: 13pt;
+            margin: 0;
+            padding-bottom: 10px;
+        }
+        h3, h4 {
+            font-size: 12pt;
+            margin: 0;
+        }
+        h5 {
+            font-size: 12pt;
+            margin: 0;
+            text-align: center;
+        }
+        table {
+            line-height: 1;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+            font-family: "SimSun", "宋体", serif;
+            font-size: 10.5pt;
+            line-height: 1;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+            font-family: "SimSun", "宋体", serif;
+            font-size: 10.5pt;
+            background-color: transparent;
+        }
+        th {
+            font-weight: bold;
+            background-color: transparent;
+        }
+        tr:nth-child(even) {
+            background-color: transparent;
+        }
+        .info-box {
+            margin: 0;
+            padding: 15px;
+            background-color: transparent;
+            font-family: "SimSun", "宋体", serif;
+            font-size: 12pt;
+            line-height: 1.5;
+        }
+        .appendix {
+            margin: 0;
+            padding: 20px 0 0 0;
+            border-top: 2px solid #000;
+        }
+        ul {
+            margin: 0 0 0 20px;
+            font-family: "SimSun", "宋体", serif;
+            font-size: 12pt;
+            line-height: 1.5;
+        }
+        li {
+            margin: 0;
+            font-family: "SimSun", "宋体", serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            text-indent: 0;
+        }
+        p {
+            font-family: "SimSun", "宋体", serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            margin: 0;
+            text-indent: 2em;
+        }
+        h5 {
+            text-align: center;
+            margin: 0;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+    <h1>${courseName}课程目标达成评价过程与分析</h1>
+    
+    <div class="info-box">
+        <p>专业：${major}   班级：${className}   学生人数：${studentCount}  样本数：${actualStudentCount} 评价人：${evaluator}</p>
+        <p>依据《${major}专业课程目标达成度评价机制与方法（试行）》进行评价。</p>
+    </div>
+    
+    <h2>一、课程目标与毕业要求矩阵关系图</h2>
+    <p>根据${major}专业二级师范认证标准要求，特制订该课程的课程目标如下：</p>
+    
+    ${generateCourseObjectivesDescriptions()}
+    
+    <h5>表1-1  ${courseName}课程目标与毕业要求的矩阵关系图</h5>
+    ${matrixTable}
+    
+    <h2>二、课程目标达成分析</h2>
+    <h3>（一）评价依据：直接分析（课程考核的量化成绩，包括过程性考核和结果性考核）与间接分析（包括学生对于课程学习的主观评价以及教师对学生的个体评价）</h3>
+    <h3>（二）课程目标定量评价过程与结果分析</h3>
+    <h4>1.课程教学目标达成评价表</h4>
+    <h5>表2-1  课程教学目标达成评价表</h5>
+    ${evaluationTable}
+    
+    <h4>2.评价方法</h4>
+    <p>本课程有${objectiveCount}个目标，达成采用定量和定性方法来评价，根据支撑毕业要求指标点的强度确定权重，具体计算方法如下：</p>
+    <p>考试成绩占${globalExamPercentage}%，平时作业成绩占${globalDailyPercentage}%</p>
+    <p>总达成=Σ（目标i达成×目标i的权重），其中i=1到${objectiveCount}</p>
+    <p>其中m为课程考核目标的指标数（${courseName}的考核指标数为${objectiveCount}，即m=${objectiveCount}）；i为1、2、${objectiveCount}。</p>
+    <p>目标i达成=目标i成绩÷目标i的总分</p>
+    <p>目标i的权重=目标i的总分÷100</p>
+    <p>目标i的权重由表1算出分别为：${generateWeightsList()}.</p>
+    <p>目标i的总分=目标i的平时成绩总分+目标i考试成绩总分</p>
+    <p>目标i的平时成绩=平时成绩×平时成绩在目标i上所占的权重×${(globalDailyPercentage/100).toFixed(2)}</p>
+    <p>目标i的考试成绩=（目标i各题考试得分×目标i各题占比之和）×${(globalExamPercentage/100).toFixed(2)}</p>
+    <p>目标i成绩=目标i的平时成绩+目标i的考试成绩</p>
+    <p>即：课程目标i评价值=（平时成绩×平时成绩在目标i上所占的权重×${(globalDailyPercentage/100).toFixed(2)}+（目标i各题考试得分×目标i各题占比之和）×${(globalExamPercentage/100).toFixed(2)}）÷（目标i平时成绩总分×${(globalDailyPercentage/100).toFixed(2)}+目标i考试成绩总分×${(globalExamPercentage/100).toFixed(2)}），其中i=1,2,${objectiveCount}.</p>
+    
+    <h4>3.评价结果分析</h4>
+    <h5>表2-2  课程教学目标达成评价结果分析</h5>
+    <table>
+        <tr>
+            <th>项目</th>
+            ${generateObjectiveHeaders(objectiveCount)}
+            <th>总达成</th>
+        </tr>
+        <tr>
+            <td>评价值</td>
+            ${objectiveValues.map(value => `<td>${value}</td>`).join('')}
+            <td>${overallValue}</td>
+        </tr>
+        <tr>
+            <td>评价结果</td>
+            ${objectiveValues.map(value => `<td>达成</td>`).join('')}
+            <td>达成</td>
+        </tr>
+    </table>
+    
+    <p>课程过程性考核和期末考核详细得分数据统计表见附录1；课程目标达成明细表见附录2。</p>
+    
+    <h4>（1）整体达成情况：</h4>
+    <p>本课程所支撑的${objectiveCount}项毕业要求指标点达成情况如图2-1所示，${objectiveCount}项课程目标评价值均为${objectiveValues[0]}，总达成同样为${overallValue}，均远超期望值0.70，表明本课程已基本实现预设的教学目标，能够有效支撑对应毕业要求指标点的达成。</p>
+    ${objectivesChartHtml}
+    
+    <h4>（2）个体达成情况：</h4>
+    <p>对${actualStudentCount}名学生个体的各课程目标考核情况进行定量统计分析，结果如图2-2所示。图2-2横坐标为学生人数，纵坐标为学生个体达成情况，结合附录2数据可知，所有学生的${objectiveCount}项课程目标达成评价值均达到0.70以上，无未达成目标的个体。从分布来看，大部分学生达成评价值集中在0.84-0.94之间，占比约86%；其中评价值≥0.90的学生有${Math.round(actualStudentCount * 0.2791)}人，占比27.91%，表现优秀；评价值在0.70-0.80之间的学生仅1人，占比${actualStudentCount > 0 ? (1/actualStudentCount * 100).toFixed(2) : '0'}%，为待提升群体。整体呈现"中间集中、两端分散"的合理分布态势，说明课程教学对不同层次学生的适配性较好，能够兼顾多数学生的学习需求，同时为优秀学生提供了提升空间。</p>
+    ${individualChartsHtml}
+    
+    <h2>三、存在的问题及整改措施</h2>
+    <h3>（一）根据评价依据和结果分析，学生学习存在以下问题</h3>
+    ${problemsAndSolutions.problems}
+    
+    <h3>（二）持续改进的措施</h3>
+    ${problemsAndSolutions.solutions}
+    
+    <div class="appendix">
+        <h2>附录</h2>
+        <h3>附录1：课程过程性考核和期末考核详细得分数据统计表</h3>
+        ${generateStudentScoresTable()}
+        
+        <h3>附录2：课程目标达成明细表</h3>
+        ${generateAchievementsTable()}
+    </div>
+</body>
+</html>
+                `;
+                
+                return reportTemplate;
+            }
+
+            // 生成课程目标描述
+            function generateCourseObjectivesDescriptions() {
+                var objectives = document.querySelectorAll('.objective-item');
+                var descriptions = '';
+                
+                objectives.forEach(function(obj, index) {
+                    var descElement = obj.querySelector('textarea');
+                    var reqElement = obj.querySelector('input[type="text"]');
+                    var desc = descElement ? descElement.value : '课程目标描述';
+                    var req = reqElement ? reqElement.value : '';
+                    
+                    descriptions += `<p><strong>${index + 1}.</strong> ${desc}${req ? '[' + req + ']' : ''}</p>`;
+                });
+                
+                return descriptions;
+            }
+
+            // 生成矩阵关系表
+            function generateMatrixTable(objectiveCount) {
+                // 调整矩阵表结构，确保子类正确对应到各个大类
+                var table = `
+                <table>
+                    <tr>
+                        <th rowspan="2">名称</th>
+                        <th colspan="2">践行师德</th>
+                        <th colspan="2">学会教学</th>
+                        <th colspan="2">学会育人</th>
+                        <th colspan="2">学会发展</th>
+                    </tr>
+                    <tr>
+                        <th>师德规范</th>
+                        <th>教育情怀</th>
+                        <th>保教知识</th>
+                        <th>保教能力</th>
+                        <th>班级管理</th>
+                        <th>综合育人</th>
+                        <th>学会反思</th>
+                        <th>沟通合作</th>
+                    </tr>
+                `;
+                
+                // 添加课程目标行
+                for (var i = 1; i <= objectiveCount; i++) {
+                    table += `<tr>
+                        <td>课程目标${i}</td>
+                        ${generateMatrixCells(i, objectiveCount)}
+                    </tr>`;
+                }
+                
+                table += `</table>`;
+                return table;
+            }
+
+            // 生成矩阵表单元格
+            function generateMatrixCells(objectiveIndex, totalObjectives) {
+                var cells = '';
+                // 根据课程目标的实际毕业要求指标点来生成矩阵单元格
+                
+                // 获取该课程目标的毕业要求指标点
+                var requirementElement = document.getElementById('objective-' + objectiveIndex + '-requirement');
+                var requirement = requirementElement ? requirementElement.value : '';
+                
+                // 定义各个子类的关键词
+                var categories = [
+                    '师德规范', '教育情怀',      // 践行师德
+                    '保教知识', '保教能力',      // 学会教学
+                    '班级管理', '综合育人',      // 学会育人
+                    '学会反思', '沟通合作'       // 学会发展
+                ];
+                
+                // 为每个子类生成单元格
+                for (var j = 0; j < categories.length; j++) {
+                    // 检查毕业要求中是否包含该子类的关键词
+                    if (requirement.includes(categories[j]) || 
+                        (categories[j] === '保教知识' && (requirement.includes('保教知识') || requirement.includes('3.1') || requirement.includes('3.2') || requirement.includes('3.3'))) ||
+                        (categories[j] === '保教能力' && (requirement.includes('保教能力') || requirement.includes('4.1') || requirement.includes('4.2'))) ||
+                        (categories[j] === '综合育人' && (requirement.includes('综合育人') || requirement.includes('6.1') || requirement.includes('6.2') || requirement.includes('6.3')))) {
+                        cells += '<td>*</td>';
+                    } else {
+                        cells += '<td></td>';
+                    }
+                }
+                return cells;
+            }
+
+            // 生成评价表
+            function generateEvaluationTable(objectiveCount, objectiveValues) {
+                var table = `
+                <table>
+                    <tr>
+                        <th>项目</th>
+                        ${generateObjectiveHeaders(objectiveCount)}
+                    </tr>
+                    <tr>
+                        <td>对应的毕业要求指标点</td>
+                        ${generateRequirementPoints(objectiveCount)}
+                    </tr>
+                    <tr>
+                        <td>评价方式</td>
+                        ${Array(objectiveCount).fill('<td>定量+定性</td>').join('')}
+                    </tr>
+                    <tr>
+                        <td>评价内容</td>
+                        ${generateEvaluationContents(objectiveCount)}
+                    </tr>
+                    <tr>
+                        <td>期望值</td>
+                        ${Array(objectiveCount).fill('<td>0.7</td>').join('')}
+                    </tr>
+                </table>
+                `;
+                return table;
+            }
+
+            // 生成课程目标表头
+            function generateObjectiveHeaders(objectiveCount) {
+                var headers = '';
+                for (var i = 1; i <= objectiveCount; i++) {
+                    headers += `<th>课程目标${i}</th>`;
+                }
+                return headers;
+            }
+
+            // 生成毕业要求指标点
+            function generateRequirementPoints(objectiveCount) {
+                var points = '';
+                for (var i = 1; i <= objectiveCount; i++) {
+                    // 从第1步的课程目标设置中获取毕业要求指标点
+                    var requirementElement = document.getElementById('objective-' + i + '-requirement');
+                    var requirement = requirementElement ? requirementElement.value : '毕业要求[M]';
+                    points += '<td>' + requirement + '</td>';
+                }
+                return points;
+            }
+
+            // 生成评价内容
+            function generateEvaluationContents(objectiveCount) {
+                var contents = '';
+                for (var i = 1; i <= objectiveCount; i++) {
+                    // 从第2步的权重设置中获取评价内容
+                    var dailyPercentageElement = document.getElementById('objective-' + i + '-daily-percentage');
+                    var dailyPercentage = dailyPercentageElement ? dailyPercentageElement.value : '0';
+                    
+                    // 获取期末考试题目设置
+                    var examItemsElement = document.getElementById('objective-' + i + '-exam-items');
+                    var examItems = '';
+                    if (examItemsElement) {
+                        var rows = examItemsElement.querySelectorAll('tr');
+                        if (rows.length > 0) {
+                                examItems = '<br>期末成绩：';
+                                rows.forEach(function(row, index) {
+                                    var nameInput = row.querySelector('.question-name');
+                                    var percentageInput = row.querySelectorAll('input[type="number"]')[1];
+                                    if (nameInput && percentageInput) {
+                                        var questionName = nameInput.value;
+                                        var percentage = percentageInput.value;
+                                        examItems += questionName + '（' + percentage + '%）+ ';
+                                    }
+                                });
+                                examItems = examItems.slice(0, -2); // 移除最后的 " + "
+                            }
+                    }
+                    
+                    contents += '<td>平时成绩（' + dailyPercentage + '%）+' + examItems + '</td>';
+                }
+                return contents;
+            }
+
+            // 生成权重列表
+            function generateWeightsList() {
+                // 从计算结果中获取权重
+                if (window.calculatedObjectives) {
+                    var weights = window.calculatedObjectives.map(function(obj) {
+                        return obj.weight.toFixed(3);
+                    });
+                    return weights.join('，');
+                }
+                // 简化版，实际应用中可能需要从计算结果中获取
+                return '0.325，0.35，0.325';
+            }
+
+            // 生成存在的问题及整改措施
+            function generateProblemsAndSolutions(stats) {
+                console.log('generateProblemsAndSolutions 函数被调用，stats:', stats);
+                
+                // 获取课程目标的具体内容
+                var objectives = document.querySelectorAll('.objective-item');
+                var objectiveContents = [];
+                objectives.forEach(function(obj, index) {
+                    var descElement = obj.querySelector('textarea');
+                    var desc = descElement ? descElement.value : '课程目标描述';
+                    objectiveContents.push(desc);
+                });
+                
+                // 分析各课程目标的达成情况
+                var objectiveProblems = [];
+                var objectiveSolutions = [];
+                
+                stats.objectiveStats.forEach(function(objStat, index) {
+                    var objectiveIndex = index + 1;
+                    var average = objStat.average;
+                    var passRate = objStat.passRate;
+                    var excellentRate = objStat.excellentRate;
+                    var achievementCount = objStat.achievements.length;
+                    
+                    // 分析学生达成度分布
+                    var lowAchievers = objStat.achievements.filter(a => a < 0.7).length;
+                    var middleAchievers = objStat.achievements.filter(a => a >= 0.7 && a < 0.85).length;
+                    var highAchievers = objStat.achievements.filter(a => a >= 0.85).length;
+                    
+                    console.log('课程目标' + objectiveIndex + '达成度:', average, '合格率:', passRate, '优秀率:', excellentRate);
+                    console.log('低达成度学生数:', lowAchievers, '中等达成度学生数:', middleAchievers, '高达成度学生数:', highAchievers);
+                    
+                    // 获取课程目标的具体内容关键词
+                    var objectiveContent = objectiveContents[index] || '';
+                    var contentKeywords = [];
+                    if (objectiveContent.includes('基础知识')) contentKeywords.push('基础知识');
+                    if (objectiveContent.includes('实践能力')) contentKeywords.push('实践能力');
+                    if (objectiveContent.includes('综合应用')) contentKeywords.push('综合应用');
+                    if (objectiveContent.includes('创新能力')) contentKeywords.push('创新能力');
+                    if (objectiveContent.includes('分析能力')) contentKeywords.push('分析能力');
+                    if (objectiveContent.includes('解决问题')) contentKeywords.push('解决问题能力');
+                    if (contentKeywords.length === 0) contentKeywords.push('核心内容');
+                    
+                    // 根据达成度生成具体问题
+                    if (average < 0.7) {
+                        objectiveProblems.push(`课程目标${objectiveIndex}达成度偏低（${average.toFixed(2)}），具体表现为：1. 学生对${contentKeywords.join('、')}的掌握不够扎实，基础薄弱；2. ${lowAchievers}名学生（占比${(lowAchievers/achievementCount*100).toFixed(1)}%）未能达到基本要求，存在明显的学习困难；3. 学生在课堂参与度和课后作业完成质量方面表现较差，学习态度需要改进；4. 知识应用能力不足，无法将所学内容与实际情境相结合。`);
+                        objectiveSolutions.push(`针对课程目标${objectiveIndex}的具体改进措施：1. 加强${contentKeywords.join('、')}的教学，采用分层教学方法，为基础薄弱学生提供额外辅导；2. 增加课堂互动和实践环节，提高学生的参与度和学习积极性；3. 设计更加贴近实际的作业和练习，强化知识应用能力；4. 建立学习跟踪机制，定期检测学生的学习进展，及时调整教学策略。`);
+                    } else if (average < 0.85) {
+                        objectiveProblems.push(`课程目标${objectiveIndex}达成度一般（${average.toFixed(2)}），具体表现为：1. 大部分学生能够掌握基本内容，但在${contentKeywords.join('、')}的深度和广度方面有待提升；2. ${middleAchievers}名学生（占比${(middleAchievers/achievementCount*100).toFixed(1)}%）处于中等水平，需要进一步提高；3. 学生的知识迁移能力和综合应用能力较弱，难以应对复杂问题；4. 部分学生学习方法不当，缺乏自主学习能力和学习策略。`);
+                        objectiveSolutions.push(`针对课程目标${objectiveIndex}的具体改进措施：1. 深化${contentKeywords.join('、')}的教学内容，增加拓展性和挑战性任务；2. 采用项目式学习和小组合作学习等方法，培养学生的综合应用能力；3. 开展学习方法指导，帮助学生掌握有效的学习策略；4. 建立学习激励机制，鼓励学生积极参与课堂讨论和课外活动。`);
+                    } else {
+                        objectiveProblems.push(`课程目标${objectiveIndex}达成度良好（${average.toFixed(2)}），但仍存在以下问题：1. 部分学生在${contentKeywords.join('、')}的高层次应用方面有待提升，如分析、评价和创造能力；2. ${highAchievers}名学生（占比${(highAchievers/achievementCount*100).toFixed(1)}%）表现优秀，但缺乏进一步发展的空间；3. 学生对前沿知识和最新研究成果的了解不够，视野需要拓宽；4. 跨学科知识整合能力较弱，难以将不同领域的知识融会贯通。`);
+                        objectiveSolutions.push(`针对课程目标${objectiveIndex}的具体改进措施：1. 设计开放性和探究性学习任务，培养学生的高层次思维能力；2. 为优秀学生提供更具挑战性的学习内容和研究机会；3. 定期引入前沿知识和最新研究成果，拓宽学生的视野；4. 开展跨学科项目合作，提高学生的知识整合能力。`);
+                    }
+                });
+                
+                // 分析整体达成情况
+                var overallAverage = stats.totalAverage;
+                var passRate = stats.passRate;
+                var excellentRate = stats.excellentRate;
+                var studentCount = stats.overallAchievements.length;
+                
+                console.log('整体达成度:', overallAverage, '合格率:', passRate, '优秀率:', excellentRate, '学生人数:', studentCount);
+                
+                // 分析个体差异
+                var sortedAchievements = [...stats.overallAchievements].sort(function(a, b) { return a - b; });
+                var minAchievement = sortedAchievements[0];
+                var maxAchievement = sortedAchievements[sortedAchievements.length - 1];
+                var achievementRange = maxAchievement - minAchievement;
+                
+                // 分析成绩分布
+                var overallLowAchievers = stats.overallAchievements.filter(a => a < 0.7).length;
+                var overallMiddleAchievers = stats.overallAchievements.filter(a => a >= 0.7 && a < 0.85).length;
+                var overallHighAchievers = stats.overallAchievements.filter(a => a >= 0.85).length;
+                
+                console.log('整体低达成度学生数:', overallLowAchievers, '中等达成度学生数:', overallMiddleAchievers, '高达成度学生数:', overallHighAchievers);
+                
+                // 生成问题列表
+                var problems = `<ul>`;
+                
+                // 添加针对各课程目标的问题
+                objectiveProblems.forEach(function(problem, index) {
+                    problems += `<li>${problem}</li>`;
+                });
+                
+                // 添加综合性问题
+                if (overallLowAchievers > 0) {
+                    problems += `<li>存在${overallLowAchievers}名学生（占比${(overallLowAchievers/studentCount*100).toFixed(1)}%）未达到基本要求，具体问题包括：1. 学习态度不端正，出勤率和作业完成率低；2. 学习基础薄弱，跟不上教学进度；3. 学习方法不当，缺乏自主学习能力；4. 对课程内容缺乏兴趣，学习动力不足。</li>`;
+                }
+                
+                if (overallMiddleAchievers > studentCount * 0.6) {
+                    problems += `<li>大部分学生（${overallMiddleAchievers}名，占比${(overallMiddleAchievers/studentCount*100).toFixed(1)}%）处于中等水平，具体问题包括：1. 学习目标不明确，缺乏学习动力；2. 知识掌握不够扎实，存在漏洞；3. 应用能力不足，无法将所学知识转化为实际技能；4. 缺乏学习策略，学习效率不高。</li>`;
+                }
+                
+                if (overallHighAchievers < studentCount * 0.2) {
+                    problems += `<li>优秀学生比例偏低（${overallHighAchievers}名，占比${(overallHighAchievers/studentCount*100).toFixed(1)}%），具体问题包括：1. 教学内容深度和广度不够，难以满足优秀学生的学习需求；2. 缺乏挑战性任务和拓展性学习机会；3. 评价方式单一，无法全面反映学生的能力和潜力；4. 优秀学生之间缺乏交流和合作的平台。</li>`;
+                }
+                
+                if (achievementRange > 0.4) {
+                    problems += `<li>学生个体差异较大（最低${minAchievement.toFixed(2)}，最高${maxAchievement.toFixed(2)}，差距${achievementRange.toFixed(2)}），具体问题包括：1. 学生学习基础和能力水平差异显著；2. 教学内容和方法未能充分考虑个体差异；3. 学习资源分配不均，部分学生获得的支持不足；4. 班级整体学习氛围受到影响，难以形成良好的学习共同体。</li>`;
+                }
+                
+                // 分析学习投入情况
+                problems += `<li>学习投入与产出不匹配，具体问题包括：1. 部分学生课堂参与度低，缺乏主动思考和提问；2. 课后复习和预习不充分，知识巩固效果不佳；3. 学习资源利用不足，如教材、参考资料和在线资源；4. 缺乏学习反思和总结，难以形成有效的知识体系。</li>`;
+                
+                problems += `</ul>`;
+                
+                // 生成整改措施列表
+                var solutions = `<div>`;
+                
+                // 添加针对各课程目标的整改措施
+                objectiveSolutions.forEach(function(solution, index) {
+                    solutions += `<p>${solution}</p>`;
+                });
+                
+                // 添加综合性整改措施
+                if (overallLowAchievers > 0) {
+                    solutions += `<p>针对未达基本要求学生的改进措施：1. 建立学习预警机制，及时识别和帮助学习困难学生；2. 开展一对一辅导，针对学生的具体问题提供个性化帮助；3. 设计基础强化课程，帮助学生补齐知识漏洞；4. 加强学习动机激发，帮助学生建立学习信心和目标。</p>`;
+                }
+                
+                if (overallMiddleAchievers > studentCount * 0.6) {
+                    solutions += `<p>针对中等水平学生的改进措施：1. 设立分层学习目标，鼓励学生逐步提升；2. 提供进阶学习资源，满足学生的学习需求；3. 开展学习方法培训，帮助学生掌握有效的学习策略；4. 建立学习小组，促进学生之间的相互学习和交流。</p>`;
+                }
+                
+                if (overallHighAchievers < studentCount * 0.2) {
+                    solutions += `<p>针对优秀学生的改进措施：1. 开发拓展性课程模块，为优秀学生提供更具挑战性的学习内容；2. 设立学科竞赛和创新项目，鼓励学生积极参与；3. 建立导师制，为优秀学生提供个性化的学术指导；4. 组织学术讲座和研讨活动，拓宽学生的学术视野。</p>`;
+                }
+                
+                if (achievementRange > 0.4) {
+                    solutions += `<p>针对个体差异较大的改进措施：1. 实施差异化教学，根据学生的学习能力和需求调整教学内容和方法；2. 建立个性化学习计划，为每个学生制定适合的学习路径；3. 丰富学习资源，提供多层次的学习材料；4. 加强班级建设，营造互帮互助的学习氛围。</p>`;
+                }
+                
+                // 添加通用整改措施
+                solutions += `<p>通用改进措施：1. 优化课程设计，根据课程目标的具体要求调整教学内容和方法；2. 加强课堂教学改革，采用多种教学方法提高学生的参与度和学习效果；3. 完善评价体系，采用多元化的评价方式全面反映学生的学习成果；4. 加强学习支持服务，为学生提供全方位的学习帮助；5. 建立教学反馈机制，定期收集学生的意见和建议，持续改进教学质量；6. 利用现代教育技术，丰富教学手段，提高教学效率和效果；7. 加强与其他课程的衔接，形成完整的课程体系，促进知识的融会贯通。</p>`;
+                
+                solutions += `</div>`;
+                
+                console.log('生成的问题:', problems);
+                console.log('生成的整改措施:', solutions);
+                
+                return { problems: problems, solutions: solutions };
+            }
+
+            // 生成学生成绩录入表格（附录1）
+            function generateStudentScoresTable() {
+                var studentsTableBody = document.getElementById('students-table-body');
+                var tableHeader = document.getElementById('students-table-header');
+                if (!studentsTableBody || !tableHeader) {
+                    return '<p>（无学生成绩数据）</p>';
+                }
+                
+                // 获取表头
+                var headerRow = tableHeader.querySelector('tr');
+                var headerCells = headerRow.querySelectorAll('th');
+                var headerHTML = '<tr>';
+                // 添加序号列表头
+                headerHTML += '<th>序号</th>';
+                // 添加其他表头（排除操作列）
+                for (var i = 0; i < headerCells.length - 1; i++) {
+                    headerHTML += '<th>' + headerCells[i].textContent + '</th>';
+                }
+                headerHTML += '</tr>';
+                
+                // 获取学生数据
+                var studentRows = studentsTableBody.querySelectorAll('tr');
+                var dataRowsHTML = '';
+                studentRows.forEach(function(row, index) {
+                    var inputs = row.querySelectorAll('input');
+                    if (inputs.length < 3) return;
+                    
+                    dataRowsHTML += '<tr>';
+                    // 添加序号
+                    dataRowsHTML += '<td>' + (index + 1) + '</td>';
+                    // 添加学生姓名
+                    dataRowsHTML += '<td>' + (inputs[0].value || '未命名') + '</td>';
+                    // 添加平时成绩
+                    dataRowsHTML += '<td>' + (inputs[1].value || '0') + '</td>';
+                    // 添加期末成绩
+                    dataRowsHTML += '<td>' + (inputs[2].value || '0') + '</td>';
+                    // 添加期末考试题目得分
+                    var questionInputs = Array.from(inputs).slice(3);
+                    questionInputs.forEach(function(input) {
+                        dataRowsHTML += '<td>' + (input.value || '0') + '</td>';
+                    });
+                    dataRowsHTML += '</tr>';
+                });
+                
+                // 添加平均分（如果有）
+                var tableFooter = document.getElementById('students-table-footer');
+                var footerHTML = '';
+                if (tableFooter) {
+                    var footerRow = tableFooter.querySelector('tr');
+                    var footerCells = footerRow.querySelectorAll('td');
+                    footerHTML = '<tr>';
+                    // 最后一行不写序号
+                    footerHTML += '<td></td>';
+                    // 添加其他分（排除操作列）
+                    for (var i = 0; i < footerCells.length - 1; i++) {
+                        footerHTML += '<td>' + footerCells[i].innerHTML + '</td>';
+                    }
+                    footerHTML += '</tr>';
+                }
+                
+                return '<table>' + headerHTML + dataRowsHTML + footerHTML + '</table>';
+            }
+            
+            // 生成课程目标达成明细表（附录2）
+            function generateAchievementsTable() {
+                var achievementsTableBody = document.getElementById('achievements-table-body');
+                var tableHeader = document.getElementById('achievements-table-header');
+                if (!achievementsTableBody || !tableHeader) {
+                    return '<p>（无达成度数据）</p>';
+                }
+                
+                // 获取表头
+                var headerRow = tableHeader.querySelector('tr');
+                var headerCells = headerRow.querySelectorAll('th');
+                var headerHTML = '<tr>';
+                // 添加序号列表头
+                headerHTML += '<th>序号</th>';
+                // 添加其他表头
+                headerCells.forEach(function(cell) {
+                    headerHTML += '<th>' + cell.textContent + '</th>';
+                });
+                headerHTML += '</tr>';
+                
+                // 获取达成度数据
+                var achievementRows = achievementsTableBody.querySelectorAll('tr');
+                var dataRowsHTML = '';
+                var totalRows = achievementRows.length;
+                var studentCount = 0;
+                
+                achievementRows.forEach(function(row, index) {
+                    var cells = row.querySelectorAll('td');
+                    if (cells.length < 3) return;
+                    
+                    // 判断是否为最后一行（课程目标达成情况行）
+                    var isLastRow = (index === totalRows - 1);
+                    
+                    dataRowsHTML += '<tr>';
+                    // 最后一行不写序号
+                    if (!isLastRow) {
+                        dataRowsHTML += '<td>' + (studentCount + 1) + '</td>';
+                        studentCount++;
+                    } else {
+                        dataRowsHTML += '<td></td>';
+                    }
+                    // 添加其他单元格数据
+                    cells.forEach(function(cell) {
+                        dataRowsHTML += '<td>' + cell.textContent + '</td>';
+                    });
+                    dataRowsHTML += '</tr>';
+                });
+                
+                return '<div style="page-break-before: always;"></div><table>' + headerHTML + dataRowsHTML + '</table>';
+            }
+            
+            // 下载报告文件
+            function downloadReport(content, filename, fileType) {
+                fileType = fileType || 'html';
+                var mimeType = fileType === 'word' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'text/html;charset=utf-8';
+                var blob = new Blob([content], { type: mimeType });
+                var url = URL.createObjectURL(blob);
+                var link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+    </script>
+</body>
+</html>
