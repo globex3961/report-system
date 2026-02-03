@@ -148,7 +148,7 @@
                             </div>
                             <div>
                                 <label class="block text-gray-700 mb-2">对应毕业要求指标点</label>
-                                <input type="text" id="objective-1-requirement" value="毕业要求3：保教知识3.1 3.2 3.3"
+                                <input type="text" id="objective-1-requirement" value="毕业要求3：保教知识【M】"
                                        class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">
                             </div>
 
@@ -170,7 +170,7 @@
                             </div>
                             <div>
                                 <label class="block text-gray-700 mb-2">对应毕业要求指标点</label>
-                                <input type="text" id="objective-2-requirement" value="毕业要求4：保教能力4.1 4.2"
+                                <input type="text" id="objective-2-requirement" value="毕业要求4：保教能力【H】"
                                        class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">
                             </div>
 
@@ -192,7 +192,7 @@
                             </div>
                             <div>
                                 <label class="block text-gray-700 mb-2">对应毕业要求指标点</label>
-                                <input type="text" id="objective-3-requirement" value="毕业要求6：综合育人6.1 6.2 6.3"
+                                <input type="text" id="objective-3-requirement" value="毕业要求6：综合育人【L】"
                                        class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">
                             </div>
 
@@ -223,11 +223,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-gray-700 mb-2">期末成绩总占比（%）</label>
-                            <input type="number" id="global-exam-percentage" class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus" value="60" min="0" max="100">
+                            <input type="number" id="global-exam-percentage" class="w-full px-4 py-2 border-2 border-red-500 rounded-md form-input-focus" value="60" min="0" max="100">
                         </div>
                         <div>
                             <label class="block text-gray-700 mb-2">平时成绩总占比（%）</label>
-                            <input type="number" id="global-daily-percentage" class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus" value="40" min="0" max="100">
+                            <input type="number" id="global-daily-percentage" class="w-full px-4 py-2 border-2 border-red-500 rounded-md form-input-focus" value="40" min="0" max="100">
                         </div>
                     </div>
                 <p class="mt-2 text-sm text-gray-600">注：期末成绩占比和平时成绩占比之和应为100%</p>
@@ -255,32 +255,32 @@
                         <tbody class="bg-white divide-y divide-gray-200" id="global-exam-items">
                             <tr>
                                 <td class="px-4 py-2"><span class="global-question-name font-medium">第1题</span></td>
-                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md global-question-score" value="5"></td>
+                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md global-question-score" value="5"></td>
                                 <td class="px-4 py-2"><button type="button" class="delete-global-question-btn text-red-500 hover:text-red-600 text-sm">删除</button></td>
                             </tr>
                             <tr>
                                 <td class="px-4 py-2"><span class="global-question-name font-medium">第2题</span></td>
-                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md global-question-score" value="5"></td>
+                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md global-question-score" value="5"></td>
                                 <td class="px-4 py-2"><button type="button" class="delete-global-question-btn text-red-500 hover:text-red-600 text-sm">删除</button></td>
                             </tr>
                             <tr>
                                 <td class="px-4 py-2"><span class="global-question-name font-medium">第3题</span></td>
-                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md global-question-score" value="10"></td>
+                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md global-question-score" value="10"></td>
                                 <td class="px-4 py-2"><button type="button" class="delete-global-question-btn text-red-500 hover:text-red-600 text-sm">删除</button></td>
                             </tr>
                             <tr>
                                 <td class="px-4 py-2"><span class="global-question-name font-medium">第4题</span></td>
-                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md global-question-score" value="35"></td>
+                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md global-question-score" value="35"></td>
                                 <td class="px-4 py-2"><button type="button" class="delete-global-question-btn text-red-500 hover:text-red-600 text-sm">删除</button></td>
                             </tr>
                             <tr>
                                 <td class="px-4 py-2"><span class="global-question-name font-medium">第5题</span></td>
-                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md global-question-score" value="5"></td>
+                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md global-question-score" value="5"></td>
                                 <td class="px-4 py-2"><button type="button" class="delete-global-question-btn text-red-500 hover:text-red-600 text-sm">删除</button></td>
                             </tr>
                             <tr>
                                 <td class="px-4 py-2"><span class="global-question-name font-medium">第6题</span></td>
-                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md global-question-score" value="40"></td>
+                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md global-question-score" value="40"></td>
                                 <td class="px-4 py-2"><button type="button" class="delete-global-question-btn text-red-500 hover:text-red-600 text-sm">删除</button></td>
                             </tr>
                         </tbody>
@@ -288,13 +288,15 @@
                 </div>
             </div>
             
-            <!-- 课程目标1 -->
-                <div class="mb-8 border border-gray-200 rounded-md p-6">
+            <!-- 课程目标容器 - 横向排列 -->
+            <div class="flex flex-wrap gap-6 mb-8">
+                <!-- 课程目标1 -->
+                <div class="flex-1 min-w-[300px] border border-gray-200 rounded-md p-6">
                     <h3 class="text-lg font-semibold mb-4">课程目标1</h3>
                     
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2">平时成绩占比（%）</label>
-                        <input type="number" id="objective-1-daily-percentage" class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus" value="50" min="0" max="100">
+                        <input type="number" id="objective-1-daily-percentage" class="w-full px-4 py-2 border-2 border-red-500 rounded-md form-input-focus" value="50" min="0" max="100">
                     </div>
                     
                     <div>
@@ -315,27 +317,27 @@
                                     <tr>
                                         <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第一题" readonly></td>
                                         <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第一题" value="5" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="80"></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md" value="80"></td>
                                     </tr>
                                     <tr>
                                         <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第二题" readonly></td>
                                         <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第二题" value="5" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="100"></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md" value="100"></td>
                                     </tr>
                                     <tr>
                                         <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第三题" readonly></td>
                                         <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第三题" value="10" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="100"></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md" value="100"></td>
                                     </tr>
                                     <tr>
                                         <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第四题" readonly></td>
                                         <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第四题" value="35" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="57"></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md" value="57"></td>
                                     </tr>
                                     <tr>
                                         <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第五题" readonly></td>
                                         <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第五题" value="5" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="100"></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md" value="100"></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -345,12 +347,12 @@
                 </div>
                 
                 <!-- 课程目标2 -->
-                <div class="mb-8 border border-gray-200 rounded-md p-6">
+                <div class="flex-1 min-w-[300px] border border-gray-200 rounded-md p-6">
                     <h3 class="text-lg font-semibold mb-4">课程目标2</h3>
                     
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2">平时成绩占比（%）</label>
-                        <input type="number" id="objective-2-daily-percentage" class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus" value="50" min="0" max="100">
+                        <input type="number" id="objective-2-daily-percentage" class="w-full px-4 py-2 border-2 border-red-500 rounded-md form-input-focus" value="50" min="0" max="100">
                     </div>
                     
                     <div>
@@ -371,12 +373,12 @@
                                     <tr>
                                         <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第四题" readonly></td>
                                         <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第四题" value="35" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="43"></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md" value="43"></td>
                                     </tr>
                                     <tr>
                                         <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第六题" readonly></td>
                                         <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第六题" value="40" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="25"></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md" value="25"></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -386,12 +388,12 @@
                 </div>
                 
                 <!-- 课程目标3 -->
-                <div class="mb-8 border border-gray-200 rounded-md p-6">
+                <div class="flex-1 min-w-[300px] border border-gray-200 rounded-md p-6">
                     <h3 class="text-lg font-semibold mb-4">课程目标3</h3>
                     
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2">平时成绩占比（%）</label>
-                        <input type="number" id="objective-3-daily-percentage" class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus" value="50" min="0" max="100">
+                        <input type="number" id="objective-3-daily-percentage" class="w-full px-4 py-2 border-2 border-red-500 rounded-md form-input-focus" value="50" min="0" max="100">
                     </div>
                     
                     <div>
@@ -412,19 +414,28 @@
                                     <tr>
                                         <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第一题" readonly></td>
                                         <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第一题" value="5" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="20"></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md" value="20"></td>
                                     </tr>
                                     <tr>
                                         <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第六题" readonly></td>
                                         <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第六题" value="40" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="75"></td>
+                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md" value="75"></td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
+            </div>
 
+            <!-- 占比总和信息显示 -->
+            <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+                <h3 class="text-lg font-semibold mb-4">占比总和信息</h3>
+                <div id="percentage-sum-info">
+                    <p class="text-gray-600">请点击下方"计算权重"按钮以查看占比总和信息。</p>
+                </div>
+                <p class="mt-2 text-sm text-red-600 font-medium">提示：1.所有的占比总和须为100%。2.输入信息后，按下“计算权重”按钮更新页面。</p>
+            </div>
 
                 <div class="flex justify-center mb-6">
                     <button id="calculate-weights-btn" class="bg-primary text-white px-6 py-3 rounded-md hover:bg-primary/90 transition-colors">
@@ -479,6 +490,7 @@
                 
                 <div class="mb-6">
                     <h3 class="text-lg font-semibold mb-4">成绩录入</h3>
+                    <p class="mb-4 text-sm text-red-600 font-medium">提示：1.下载模版，填入信息。2.填完后直接“保存”，不要“另存为xlsx格式“，不要改变文件格式（.csv）。3.导入模版。</p>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50" id="students-table-header">
@@ -505,18 +517,16 @@
                             <button id="add-student" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors">
                                 添加学生
                             </button>
-                            <button id="import-students" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors">
+                            <button id="import-students" class="border-2 border-red-500 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors">
                                 导入模版
                             </button>
-                            <a href="#" id="download-template" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors inline-block">
+                            <a href="#" id="download-template" class="border-2 border-red-500 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors inline-block">
                                 下载模板
                             </a>
                             <input type="file" id="student-file" accept=".csv" class="hidden">
                         </div>
                         <div class="space-x-4">
-                            <button id="calculate-averages" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors">
-                                计算平均分
-                            </button>
+
                             <button id="calculate-achievements" class="bg-primary text-white px-6 py-3 rounded-md hover:bg-primary/90 transition-colors">
                                 计算达成度
                             </button>
@@ -542,19 +552,15 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="mt-4 flex justify-center">
-                        <button id="export-achievements" class="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary/90 transition-colors">
-                            导出达成度
-                        </button>
-                    </div>
+
                 </div>
 
                 <div class="mb-6">
                     <h3 class="text-lg font-semibold mb-4">达成情况图</h3>
                     <div class="mb-6">
                     <h4 class="font-medium mb-2">课程目标支撑指标点达成情况</h4>
-                    <div class="w-full h-80">
-                        <canvas id="objectives-chart"></canvas>
+                    <div class="w-full" style="width: 14cm; height: 8cm;">
+                        <canvas id="objectives-chart" style="width: 14cm; height: 8cm;"></canvas>
                     </div>
                     <div class="mt-4 flex justify-center">
                         <button id="export-objectives-chart" class="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary/90 transition-colors">
@@ -591,8 +597,15 @@
                     
                     <!-- 支付提示 -->
                     <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md" id="payment-prompt">
-                        <h4 class="font-medium mb-2 text-yellow-800">付费提示</h4>
-                        <p class="text-yellow-700" id="payment-message">嗨！感谢你的支持。我尊重自己的劳动成果，所以导出分析报告需要支付费用。你可以自由决定支付金额。请扫描下方二维码完成支付，支付完成后点击"生成分析报告"按钮。</p>
+                        <p class="text-yellow-700" id="payment-message">🎉 首次使用免费！感谢您的支持。您可以直接点击"生成分析报告"按钮导出报告。</p>
+                    </div>
+                    
+                    <!-- 提示信息 -->
+                    <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
+                        <h4 class="font-medium mb-2 text-blue-800">提示</h4>
+                        <p class="text-blue-700">1. 下载后，在"视图"中选择"页面"，即可正常查看。</p>
+                        <p class="text-blue-700">2. 报告需要您动手调整格式。</p>
+                        <p class="text-blue-700">3. 报告不包含"课程目标定性评价结果分析"，即学生主观评价调查。</p>
                     </div>
                     
                     <!-- 微信支付二维码 -->
@@ -604,10 +617,8 @@
                         
                         <div class="mb-4">
                             <label class="block text-gray-700 mb-2">报告格式</label>
-                            <select id="report-format" class="px-4 py-2 border border-gray-300 rounded-md form-input-focus">
-                                <option value="html">HTML格式</option>
-                                <option value="word">Word格式</option>
-                            </select>
+                            <input type="text" value="Word格式" readonly class="px-4 py-2 border border-gray-300 rounded-md form-input-focus bg-gray-100">
+                            <input type="hidden" id="report-format" value="word">
                         </div>
                         <button id="generate-report" class="bg-green-600 text-white px-8 py-4 rounded-md hover:bg-green-700 transition-colors text-lg font-medium">
                             生成分析报告
@@ -634,7 +645,8 @@
 
     <!-- JavaScript -->
     <script>
-        // 同步学生成绩录入表格的期末考试题目
+        document.addEventListener('DOMContentLoaded', function() {
+            // 同步学生成绩录入表格的期末考试题目
             function syncStudentsTableExamItems() {
                 var globalExamItems = document.getElementById('global-exam-items');
                 if (!globalExamItems) return;
@@ -754,89 +766,123 @@
                 // 重新计算平均分
                 calculateAverages();
             }
-        
-        // 添加学生行
-        function addStudentRow(tableBody, globalRows) {
-            var newRow = document.createElement('tr');
-            rebuildStudentRow(newRow, globalRows);
-            tableBody.appendChild(newRow);
-        }
-        
-        // 重建学生行
-        function rebuildStudentRow(row, globalRows) {
-            row.innerHTML = '';
             
-            // 添加学生姓名输入框
-            var nameCell = document.createElement('td');
-            nameCell.className = 'px-4 py-2';
-            var nameInput = document.createElement('input');
-            nameInput.type = 'text';
-            nameInput.className = 'w-full px-3 py-2 border border-gray-300 rounded-md';
-            nameInput.placeholder = '学生姓名';
-            nameCell.appendChild(nameInput);
-            row.appendChild(nameCell);
+            // 添加学生行
+            function addStudentRow(tableBody, globalRows) {
+                var newRow = document.createElement('tr');
+                rebuildStudentRow(newRow, globalRows);
+                tableBody.appendChild(newRow);
+            }
             
-            // 添加平时成绩输入框
-            var dailyCell = document.createElement('td');
-            dailyCell.className = 'px-4 py-2';
-            var dailyInput = document.createElement('input');
-            dailyInput.type = 'number';
-            dailyInput.className = 'w-full px-3 py-2 border border-gray-300 rounded-md';
-            dailyInput.min = '0';
-            dailyInput.max = '100';
-            dailyInput.value = '0';
-            dailyCell.appendChild(dailyInput);
-            row.appendChild(dailyCell);
+            // 重建学生行
+            function rebuildStudentRow(row, globalRows) {
+                row.innerHTML = '';
+                
+                // 添加学生姓名输入框
+                var nameCell = document.createElement('td');
+                nameCell.className = 'px-4 py-2';
+                var nameInput = document.createElement('input');
+                nameInput.type = 'text';
+                nameInput.className = 'w-full px-3 py-2 border border-gray-300 rounded-md';
+                nameInput.placeholder = '学生姓名';
+                nameCell.appendChild(nameInput);
+                row.appendChild(nameCell);
+                
+                // 添加平时成绩输入框
+                var dailyCell = document.createElement('td');
+                dailyCell.className = 'px-4 py-2';
+                var dailyInput = document.createElement('input');
+                dailyInput.type = 'number';
+                dailyInput.className = 'w-full px-3 py-2 border border-gray-300 rounded-md';
+                dailyInput.min = '0';
+                dailyInput.max = '100';
+                dailyInput.value = '0';
+                dailyCell.appendChild(dailyInput);
+                row.appendChild(dailyCell);
+                
+                // 添加期末成绩输入框
+                var examCell = document.createElement('td');
+                examCell.className = 'px-4 py-2';
+                var examInput = document.createElement('input');
+                examInput.type = 'number';
+                examInput.className = 'w-full px-3 py-2 border border-gray-300 rounded-md';
+                examInput.min = '0';
+                examInput.max = '100';
+                examInput.value = '0';
+                examCell.appendChild(examInput);
+                row.appendChild(examCell);
+                
+                // 添加期末考试题目小分输入框
+                globalRows.forEach(function(globalRow) {
+                    var nameSpan = globalRow.querySelector('.global-question-name');
+                    var scoreInput = globalRow.querySelector('.global-question-score');
+                    if (nameSpan && scoreInput) {
+                        var questionName = nameSpan.textContent;
+                        var totalScore = scoreInput.value;
+                        var td = document.createElement('td');
+                        td.className = 'px-4 py-2';
+                        td.title = questionName + '，总分' + totalScore;
+                        var input = document.createElement('input');
+                        input.type = 'number';
+                        input.className = 'w-full px-3 py-2 border border-gray-300 rounded-md';
+                        input.min = '0';
+                        input.max = totalScore;
+                        input.value = '0';
+                        td.appendChild(input);
+                        row.appendChild(td);
+                    }
+                });
+                
+                // 添加删除学生按钮
+                var deleteCell = document.createElement('td');
+                deleteCell.className = 'px-4 py-2';
+                var deleteButton = document.createElement('button');
+                deleteButton.className = 'bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors delete-student';
+                deleteButton.textContent = '删除';
+                deleteButton.addEventListener('click', function() {
+                    row.remove();
+                    calculateAverages();
+                });
+                deleteCell.appendChild(deleteButton);
+                row.appendChild(deleteCell);
+            }
             
-            // 添加期末成绩输入框
-            var examCell = document.createElement('td');
-            examCell.className = 'px-4 py-2';
-            var examInput = document.createElement('input');
-            examInput.type = 'number';
-            examInput.className = 'w-full px-3 py-2 border border-gray-300 rounded-md';
-            examInput.min = '0';
-            examInput.max = '100';
-            examInput.value = '0';
-            examCell.appendChild(examInput);
-            row.appendChild(examCell);
+            // 为第2步中的输入框添加事件监听器，实现实时更新
+            function addStep2InputListeners() {
+                var step2Content = document.getElementById('step-2');
+                if (!step2Content) return;
+                
+                // 为所有平时成绩占比输入框添加事件监听器
+                var dailyPercentageInputs = step2Content.querySelectorAll('[id^="objective-"]');
+                dailyPercentageInputs.forEach(function(input) {
+                    if (input.id.includes('-daily-percentage')) {
+                        input.addEventListener('input', function() {
+                            if (typeof window.calculateWeights === 'function') {
+                                window.calculateWeights();
+                            }
+                        });
+                    }
+                });
+                
+                // 为所有期末成绩题目占比输入框添加事件监听器
+                var examItemsTables = step2Content.querySelectorAll('[id$="-exam-items"]');
+                examItemsTables.forEach(function(table) {
+                    var rows = table.querySelectorAll('tr');
+                    rows.forEach(function(row) {
+                        var percentageInput = row.querySelectorAll('input[type="number"]')[1];
+                        if (percentageInput) {
+                            percentageInput.addEventListener('input', function() {
+                                if (typeof window.calculateWeights === 'function') {
+                                    window.calculateWeights();
+                                }
+                            });
+                        }
+                    });
+                });
+            }
             
-            // 添加期末考试题目小分输入框
-            globalRows.forEach(function(globalRow) {
-                var nameSpan = globalRow.querySelector('.global-question-name');
-                var scoreInput = globalRow.querySelector('.global-question-score');
-                if (nameSpan && scoreInput) {
-                    var questionName = nameSpan.textContent;
-                    var totalScore = scoreInput.value;
-                    var td = document.createElement('td');
-                    td.className = 'px-4 py-2';
-                    td.title = questionName + '，总分' + totalScore;
-                    var input = document.createElement('input');
-                    input.type = 'number';
-                    input.className = 'w-full px-3 py-2 border border-gray-300 rounded-md';
-                    input.min = '0';
-                    input.max = totalScore;
-                    input.value = '0';
-                    td.appendChild(input);
-                    row.appendChild(td);
-                }
-            });
-            
-            // 添加删除学生按钮
-            var deleteCell = document.createElement('td');
-            deleteCell.className = 'px-4 py-2';
-            var deleteButton = document.createElement('button');
-            deleteButton.className = 'bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors delete-student';
-            deleteButton.textContent = '删除学生';
-            deleteButton.addEventListener('click', function() {
-                row.remove();
-                calculateAverages();
-            });
-            deleteCell.appendChild(deleteButton);
-            row.appendChild(deleteCell);
-        }
-        
-        // 同步所有课程目标的期末成绩题目设置
-        function syncAllObjectivesExamItems() {
+            // 同步所有课程目标的期末成绩题目设置
+            function syncAllObjectivesExamItems() {
                 var globalExamItems = document.getElementById('global-exam-items');
                 if (!globalExamItems) {
                     return;
@@ -849,13 +895,31 @@
                 }
                 
                 // 查找所有课程目标权重设置部分
-                var objectiveSections = step2Content.querySelectorAll('.mb-8.border.border-gray-200.rounded-md.p-6');
+                var objectiveSections = step2Content.querySelectorAll('.border.border-gray-200.rounded-md.p-6');
+                
+                // 过滤掉不是课程目标的div（比如权重结果表格的容器）
+                objectiveSections = Array.from(objectiveSections).filter(function(section) {
+                    return section.querySelector('[id$="-exam-items"]') !== null;
+                });
                 
                 // 为每个课程目标同步期末成绩题目设置
                 objectiveSections.forEach(function(section) {
                     // 查找期末成绩题目设置表格
                     var examItems = section.querySelector('[id$="-exam-items"]');
                     if (examItems) {
+                        // 保存用户填写的占比信息
+                        var savedPercentages = {};
+                        var existingRows = examItems.querySelectorAll('tr');
+                        existingRows.forEach(function(row) {
+                            var nameInput = row.querySelector('.question-name');
+                            var percentageInput = row.querySelectorAll('input[type="number"]')[1];
+                            if (nameInput && percentageInput) {
+                                var questionName = nameInput.value;
+                                var percentage = percentageInput.value;
+                                savedPercentages[questionName] = percentage;
+                            }
+                        });
+                        
                         // 清空现有题目
                         examItems.innerHTML = '';
                         
@@ -868,10 +932,13 @@
                                 var name = nameSpan.textContent;
                                 var score = scoreInput.value;
                                 
+                                // 获取保存的占比信息，如果没有则使用默认值0
+                                var savedPercentage = savedPercentages[name] || '0';
+                                
                                 var newRow = document.createElement('tr');
                                 newRow.innerHTML = '<td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="' + name + '" readonly></td>' +
                                     '<td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="' + name + '" value="' + score + '" readonly></td>' +
-                                    '<td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="0"></td>';
+                                    '<td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md" value="' + savedPercentage + '"></td>';
                                 examItems.appendChild(newRow);
                             }
                         });
@@ -898,6 +965,9 @@
                 
                 // 为所有输入框添加事件监听器
                 addObjectiveInputListeners();
+                
+                // 为第2步中的输入框添加事件监听器，实现实时更新
+                addStep2InputListeners();
                 
                 // 为全局成绩占比设置中的输入框添加事件监听器
                 var globalExamPercentage = document.getElementById('global-exam-percentage');
@@ -1303,7 +1373,9 @@
             window.calculateWeights = function() {
                 console.log('calculateWeights 函数被调用');
                 var weightResultsBody = document.getElementById('weight-results');
+                var percentageSumInfo = document.getElementById('percentage-sum-info');
                 console.log('weightResultsBody:', weightResultsBody);
+                console.log('percentageSumInfo:', percentageSumInfo);
                 if (!weightResultsBody) {
                     console.log('weightResultsBody 不存在');
                     return;
@@ -1311,13 +1383,79 @@
                 
                 // 清空结果表格，确保每次点击都重新计算
                 weightResultsBody.innerHTML = '';
+                
+                // 计算占比总和
+                var globalExamItems = document.getElementById('global-exam-items');
+                var questionNames = [];
+                if (globalExamItems) {
+                    var globalRows = globalExamItems.querySelectorAll('tr');
+                    globalRows.forEach(function(row) {
+                        var nameSpan = row.querySelector('.global-question-name');
+                        if (nameSpan) {
+                            questionNames.push(nameSpan.textContent);
+                        }
+                    });
+                }
+                
+                // 初始化占比总和
+                var totalDailyPercentage = 0;
+                var questionPercentages = {};
+                questionNames.forEach(function(name) {
+                    questionPercentages[name] = 0;
+                });
+                
+                // 获取课程目标数量
+                var objectiveCount = document.querySelectorAll('.objective-item').length;
+                
+                // 遍历所有课程目标
+                for (var objectiveNumber = 1; objectiveNumber <= objectiveCount; objectiveNumber++) {
+                    // 计算平时成绩占比总和
+                    var dailyPercentageElement = document.getElementById('objective-' + objectiveNumber + '-daily-percentage');
+                    if (dailyPercentageElement) {
+                        var dailyPercentage = parseInt(dailyPercentageElement.value) || 0;
+                        totalDailyPercentage += dailyPercentage;
+                    }
+                    
+                    // 计算每道题的占比总和
+                    var examItemsElement = document.getElementById('objective-' + objectiveNumber + '-exam-items');
+                    if (examItemsElement) {
+                        var scoreRows = examItemsElement.getElementsByTagName('tr');
+                        for (var k = 0; k < scoreRows.length; k++) {
+                            var row = scoreRows[k];
+                            var nameInput = row.querySelector('.question-name');
+                            var percentageInput = row.querySelectorAll('input[type="number"]')[1];
+                            
+                            if (nameInput && percentageInput) {
+                                var questionName = nameInput.value.trim();
+                                var percentage = parseInt(percentageInput.value) || 0;
+                                if (questionPercentages.hasOwnProperty(questionName)) {
+                                    questionPercentages[questionName] += percentage;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // 显示占比总和信息
+                if (percentageSumInfo) {
+                    var infoHtml = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+                    infoHtml += '<div><strong>平时占比总和：</strong>' + totalDailyPercentage + '%</div>';
+                    
+                    // 显示每道题的占比总和
+                    questionNames.forEach(function(name, index) {
+                        infoHtml += '<div><strong>第' + (index + 1) + '题占比总和：</strong>' + questionPercentages[name] + '%</div>';
+                    });
+                    
+                    infoHtml += '</div>';
+                    percentageSumInfo.innerHTML = infoHtml;
+                }
 
                 // 获取全局成绩占比设置
                 var globalExamPercentageElement = document.getElementById('global-exam-percentage');
                 var globalDailyPercentageElement = document.getElementById('global-daily-percentage');
                 
-                var globalExamPercentage = globalExamPercentageElement ? parseInt(globalExamPercentageElement.value) || 60 : 60;
-                var globalDailyPercentage = globalDailyPercentageElement ? parseInt(globalDailyPercentageElement.value) || 40 : 40;
+                var globalExamPercentage = globalExamPercentageElement ? (parseInt(globalExamPercentageElement.value) || 60) : 60;
+                var globalDailyPercentage = globalDailyPercentageElement ? (parseInt(globalDailyPercentageElement.value) || 40) : 40;
                 
                 console.log('全局期末成绩占比:', globalExamPercentage);
                 console.log('全局平时成绩占比:', globalDailyPercentage);
@@ -1400,6 +1538,11 @@
                     weightResultsBody.appendChild(row);
                 }
 
+                // 添加合计行
+                var totalRow = document.createElement('tr');
+                totalRow.innerHTML = '<td class="px-6 py-4 whitespace-nowrap font-bold">合计</td><td class="px-6 py-4 whitespace-nowrap"></td><td class="px-6 py-4 whitespace-nowrap font-bold text-primary">' + totalRawWeight.toFixed(3) + '</td>';
+                weightResultsBody.appendChild(totalRow);
+
                 // 保存计算得到的权重
                 window.calculatedObjectives = objectives;
                 console.log('权重计算完成，结果：', objectives);
@@ -1423,7 +1566,7 @@
                 
                 newRow.innerHTML = `
                     <td class="px-4 py-2"><span class="global-question-name font-medium">第${questionNumber}题</span></td>
-                    <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md global-question-score" value="10"></td>
+                    <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md global-question-score" value="10"></td>
                     <td class="px-4 py-2"><button type="button" class="delete-global-question-btn text-red-500 hover:text-red-600 text-sm">删除</button></td>
                 `;
                 
@@ -1722,12 +1865,12 @@
                     
                     var dailyCell = document.createElement('td');
                     dailyCell.className = 'px-4 py-2';
-                    dailyCell.textContent = dailyScore.toFixed(2);
+                    dailyCell.textContent = Math.round(dailyScore);
                     achievementRow.appendChild(dailyCell);
                     
                     var examCell = document.createElement('td');
                     examCell.className = 'px-4 py-2';
-                    examCell.textContent = examScore.toFixed(2);
+                    examCell.textContent = Math.round(examScore);
                     achievementRow.appendChild(examCell);
                     
                     // 计算各课程目标达成度（按照第二步计算权重的方式）
@@ -1738,13 +1881,13 @@
                     for (var i = 1; i <= objectiveCount; i++) {
                         // 获取课程目标的平时成绩占比
                         var dailyPercentageElement = document.getElementById('objective-' + i + '-daily-percentage');
-                        var dailyPercentage = dailyPercentageElement ? parseFloat(dailyPercentageElement.value) / 100 : 0;
+                        var dailyPercentage = dailyPercentageElement ? (parseFloat(dailyPercentageElement.value) || 0) / 100 : 0;
                         
                         // 获取全局成绩占比设置
                         var globalExamPercentageElement = document.getElementById('global-exam-percentage');
                         var globalDailyPercentageElement = document.getElementById('global-daily-percentage');
-                        var globalExamPercentage = globalExamPercentageElement ? parseFloat(globalExamPercentageElement.value) / 100 : 0.6;
-                        var globalDailyPercentage = globalDailyPercentageElement ? parseFloat(globalDailyPercentageElement.value) / 100 : 0.4;
+                        var globalExamPercentage = globalExamPercentageElement ? (parseFloat(globalExamPercentageElement.value) || 60) / 100 : 0.6;
+                        var globalDailyPercentage = globalDailyPercentageElement ? (parseFloat(globalDailyPercentageElement.value) || 40) / 100 : 0.4;
                         
                         // 计算期末题目得分总和：Σ(题目得分×占比/100)
                         var examTotalScore = 0;
@@ -2007,6 +2150,16 @@
                 if (!chart) return;
                 
                 try {
+                    // 设置图表尺寸为14×8厘米（转换为像素，1cm ≈ 37.8px）
+                    var width = 14 * 37.8;
+                    var height = 8 * 37.8;
+                    
+                    chart.canvas.width = width;
+                    chart.canvas.height = height;
+                    
+                    // 重新绘制图表以适应新尺寸
+                    chart.update();
+                    
                     // 获取图表的base64图片
                     var image = chart.toBase64Image('image/png', 1.0);
                     
@@ -2385,13 +2538,7 @@
                 });
             }
 
-            // 为计算平均分按钮添加点击事件监听器
-            var calculateAveragesBtn = document.getElementById('calculate-averages');
-            if (calculateAveragesBtn) {
-                calculateAveragesBtn.addEventListener('click', function() {
-                    calculateAverages();
-                });
-            }
+
 
 
             document.getElementById('back-to-step-1').addEventListener('click', function() {
@@ -2441,11 +2588,11 @@
                 if (step2Content) {
                     // 创建新的课程目标权重设置部分
                     var newObjectiveWeightSection = document.createElement('div');
-                    newObjectiveWeightSection.className = 'mb-8 border border-gray-200 rounded-md p-6';
+                    newObjectiveWeightSection.className = 'flex-1 min-w-[300px] border border-gray-200 rounded-md p-6';
                     newObjectiveWeightSection.innerHTML = '<h3 class="text-lg font-semibold mb-4">课程目标' + objectiveCount + '</h3>' +
                         '<div class="mb-4">' +
                             '<label class="block text-gray-700 mb-2">平时成绩占比（%）</label>' +
-                            '<input type="number" id="objective-' + objectiveCount + '-daily-percentage" class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus" value="33" min="0" max="100">' +
+                            '<input type="number" id="objective-' + objectiveCount + '-daily-percentage" class="w-full px-4 py-2 border-2 border-red-500 rounded-md form-input-focus" value="33" min="0" max="100">' +
                         '</div>' +
                         '<div>' +
                                 '<h4 class="font-medium mb-2">期末成绩题目设置</h4>' +
@@ -2467,18 +2614,18 @@
                             '</div>' +
                         '</div>';
                     
-                    // 将新的课程目标权重设置部分添加到步骤2的合适位置（在权重结果表格之前）
-                    var weightResultsTable = document.getElementById('weight-results');
-                    if (weightResultsTable) {
-                        var parentElement = weightResultsTable.closest('div');
-                        if (parentElement) {
-                            parentElement.parentNode.insertBefore(newObjectiveWeightSection, parentElement);
-                        }
+                    // 将新的课程目标权重设置部分添加到横向排列的容器中
+                    var objectivesContainer = step2Content.querySelector('.flex.flex-wrap.gap-6.mb-8');
+                    if (objectivesContainer) {
+                        objectivesContainer.appendChild(newObjectiveWeightSection);
                     }
                 }
                 
                 // 同步所有课程目标的期末成绩题目设置
                 syncAllObjectivesExamItems();
+                
+                // 为新添加的输入框添加事件监听器
+                addStep2InputListeners();
 
                 // 添加删除事件
                 var deleteButton = newObjective.querySelector('.delete-objective');
@@ -2496,7 +2643,7 @@
                     var step2Content = document.getElementById('step-2');
                     if (step2Content) {
                         // 找到所有课程目标权重设置部分
-                        var objectiveWeightSections = step2Content.querySelectorAll('.mb-8.border.border-gray-200.rounded-md.p-6');
+                        var objectiveWeightSections = step2Content.querySelectorAll('.flex-1.min-w-\[300px\].border.border-gray-200.rounded-md.p-6');
                         // 删除最后一个权重设置部分
                         if (objectiveWeightSections.length > 0) {
                             objectiveWeightSections[objectiveWeightSections.length - 1].remove();
@@ -2536,13 +2683,13 @@
                         var step2Content = document.getElementById('step-2');
                         if (step2Content) {
                             // 找到所有课程目标权重设置部分
-                            var objectiveWeightSections = step2Content.querySelectorAll('.mb-8.border.border-gray-200.rounded-md.p-6');
+                            var objectiveWeightSections = step2Content.querySelectorAll('.flex-1.min-w-\[300px\].border.border-gray-200.rounded-md.p-6');
                             // 重新计算目标数量，删除多余的权重设置部分
                             var newObjectiveCount = document.querySelectorAll('.objective-item').length;
                             while (objectiveWeightSections.length > newObjectiveCount) {
                                 objectiveWeightSections[objectiveWeightSections.length - 1].remove();
                                 // 重新获取列表，因为DOM已经改变
-                                objectiveWeightSections = step2Content.querySelectorAll('.mb-8.border.border-gray-200.rounded-md.p-6');
+                                objectiveWeightSections = step2Content.querySelectorAll('.flex-1.min-w-\[300px\].border.border-gray-200.rounded-md.p-6');
                             }
                         }
                     });
@@ -2552,90 +2699,6 @@
             // 初始添加删除按钮监听器
             addDeleteObjectiveListeners();
             
-            // 为添加课程目标按钮添加事件监听器
-            document.getElementById('add-objective').addEventListener('click', function() {
-                var courseObjectives = document.getElementById('course-objectives');
-                var objectiveCount = courseObjectives.children.length + 1;
-
-                var newObjective = document.createElement('div');
-                newObjective.className = 'objective-item border border-gray-200 rounded-md p-4 mb-4';
-                newObjective.innerHTML = '<div class="flex justify-between items-center mb-4">' +
-                    '<h4 class="font-medium">课程目标' + objectiveCount + '</h4>' +
-                    '<button class="delete-objective-btn text-red-500 hover:text-red-700 text-sm">删除</button>' +
-                '</div>' +
-                '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">' +
-                    '<div>' +
-                        '<label class="block text-gray-700 mb-2">目标描述</label>' +
-                        '<textarea id="objective-' + objectiveCount + '-desc" rows="3" ' +
-                                  'class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus"></textarea>' +
-                    '</div>' +
-                    '<div>' +
-                        '<label class="block text-gray-700 mb-2">对应毕业要求指标点</label>' +
-                        '<input type="text" id="objective-' + objectiveCount + '-requirement" ' +
-                               'class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">' +
-                    '</div>' +
-                '</div>';
-
-                courseObjectives.appendChild(newObjective);
-
-                // 在权重设置部分添加对应的课程目标行
-                var weightResultsBody = document.getElementById('weight-results');
-                if (weightResultsBody) {
-                    var newWeightRow = document.createElement('tr');
-                    newWeightRow.innerHTML = '<td class="px-6 py-4 whitespace-nowrap">课程目标' + objectiveCount + '</td>' +
-                        '<td class="px-6 py-4 whitespace-nowrap"></td>' +
-                        '<td class="px-6 py-4 whitespace-nowrap font-medium text-primary">0.000</td>';
-                    weightResultsBody.appendChild(newWeightRow);
-                }
-
-                // 在权重设置部分添加对应的平时成绩占比和期末成绩题目设置
-                var step2Content = document.getElementById('step-2');
-                if (step2Content) {
-                    // 创建新的课程目标权重设置部分
-                    var newObjectiveWeightSection = document.createElement('div');
-                    newObjectiveWeightSection.className = 'mb-8 border border-gray-200 rounded-md p-6';
-                    newObjectiveWeightSection.innerHTML = '<h3 class="text-lg font-semibold mb-4">课程目标' + objectiveCount + '</h3>' +
-                        '<div class="mb-4">' +
-                            '<label class="block text-gray-700 mb-2">平时成绩占比（%）</label>' +
-                            '<input type="number" id="objective-' + objectiveCount + '-daily-percentage" class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus" value="33" min="0" max="100">' +
-                        '</div>' +
-                        '<div>' +
-                                '<h4 class="font-medium mb-2">期末成绩题目设置</h4>' +
-                                '<div class="flex justify-between items-center mb-2">' +
-                                    '<p class="text-gray-600">请输入期末每一个小题的占比（总分已从期末考试设置中同步）</p>' +
-                                '</div>' +
-                                '<div class="overflow-x-auto">' +
-                                '<table class="min-w-full divide-y divide-gray-200">' +
-                                    '<thead class="bg-gray-50">' +
-                                        '<tr>' +
-                                            '<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">题目</th>' +
-                                            '<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">总分</th>' +
-                                            '<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">占比（%）</th>' +
-                                        '</tr>' +
-                                    '</thead>' +
-                                    '<tbody class="bg-white divide-y divide-gray-200" id="objective-' + objectiveCount + '-exam-items">' +
-                                    '</tbody>' +
-                                '</table>' +
-                            '</div>' +
-                        '</div>';
-                    
-                    // 将新的课程目标权重设置部分添加到步骤2的合适位置（在权重结果表格之前）
-                    var weightResultsTable = document.getElementById('weight-results');
-                    if (weightResultsTable) {
-                        var parentElement = weightResultsTable.closest('div');
-                        if (parentElement) {
-                            parentElement.parentNode.insertBefore(newObjectiveWeightSection, parentElement);
-                        }
-                    }
-                }
-                
-                // 同步所有课程目标的期末成绩题目设置
-                syncAllObjectivesExamItems();
-
-                // 添加删除事件
-                addDeleteObjectiveListeners();
-            });
-
             // 更新目标编号
             function updateObjectiveNumbers() {
                 var objectiveItems = document.querySelectorAll('.objective-item');
@@ -2738,13 +2801,13 @@
                 
                 if (usageCount === 0) {
                     // 首次使用，免费
-                    paymentMessage.innerHTML = '🎉 首次使用免费！感谢你的支持。你可以直接点击"生成分析报告"按钮导出报告。';
+                    paymentMessage.innerHTML = '🎉 首次使用免费！感谢您的支持。您可以直接点击"生成分析报告"按钮导出报告。';
                     // 隐藏二维码图片和文本，但保持其他部分（报告格式选择和生成按钮）可见
                     if (qrCodeImage) qrCodeImage.style.display = 'none';
                     if (qrCodeText) qrCodeText.style.display = 'none';
                 } else {
                     // 后续使用，每次8.88元
-                    paymentMessage.innerHTML = '嗨！感谢你的支持。后续每次导出分析报告需要支付8.88元费用。请扫描下方二维码完成支付，支付完成后点击"生成分析报告"按钮。';
+                    paymentMessage.innerHTML = '免费次数已使用完毕。每次导出分析报告需要支付8.88元。请扫描下方二维码完成支付，支付完成后点击"生成分析报告"按钮。';
                     // 显示二维码图片和文本
                     if (qrCodeImage) qrCodeImage.style.display = 'block';
                     if (qrCodeText) {
@@ -2753,29 +2816,6 @@
                     }
                 }
             }
-            
-            // 为生成报告按钮添加事件监听器
-            document.getElementById('generate-report').addEventListener('click', function() {
-                console.log('生成报告按钮被点击');
-                
-                const usageCount = checkUsageCount();
-                
-                if (usageCount === 0) {
-                    // 首次使用，直接生成报告
-                    generateReport();
-                    // 更新使用次数
-                    updateUsageCount();
-                    // 更新支付提示
-                    updatePaymentPrompt();
-                } else {
-                    // 后续使用，需要支付
-                    if (confirm('嗨！感谢你的支持。\n\n请确认您已通过微信支付完成了8.88元费用的支付。\n\n点击"确定"继续生成报告，点击"取消"返回完成支付。')) {
-                        generateReport();
-                        // 更新使用次数
-                        updateUsageCount();
-                    }
-                }
-            });
             
             // 页面加载时更新支付提示
             window.addEventListener('load', function() {
@@ -2984,13 +3024,21 @@
                         var stats = calculateAchievementStats(overallAchievements, objectiveAchievements);
                         console.log('统计数据计算完成:', stats);
                         
-                        // 获取用户选择的报告格式
-                        var reportFormat = document.getElementById('report-format').value || 'html';
+                        // 固定使用Word格式
+                        var reportFormat = 'word';
                         
                         // 生成报告内容
                         var actualStudentCount = studentRows.length;
+                        console.log('开始生成报告内容，课程名称:', courseName);
+                        console.log('图表尺寸设置已修改为8×14厘米');
                         var reportContent = generateReportContent(courseName, className, studentCount, evaluator, major, stats, objectiveCount, actualStudentCount);
-                        console.log('报告内容生成完成');
+                        console.log('报告内容生成完成，长度:', reportContent.length);
+                        // 检查报告内容是否包含修改后的图片尺寸
+                        if (reportContent.includes('width: 8cm; height: 14cm;')) {
+                            console.log('✅ 报告内容包含修改后的图片尺寸');
+                        } else {
+                            console.log('❌ 报告内容不包含修改后的图片尺寸');
+                        }
                         
                         // 创建并下载报告文件
                         var filename = courseName + '课程目标达成评价报告.' + (reportFormat === 'word' ? 'docx' : 'html');
@@ -3049,9 +3097,9 @@
                         var objectivesChartImage = window.objectivesChart.toBase64Image('image/png', 1.0);
                         console.log('成功获取课程目标图表base64');
                         objectivesChartHtml = `
-                        <div class="text-center my-6" style="width: 100%; max-width: 600px; margin: 0 auto;">
+                        <div class="text-center my-6" style="width: 8cm; margin: 0 auto;">
                             <h5>图2-1 课程目标支撑指标点达成情况</h5>
-                            <img src="${objectivesChartImage}" alt="课程目标支撑指标点达成情况" style="width: 100%; height: auto; display: block; margin: 0 auto; page-break-inside: avoid;">
+                            <img src="${objectivesChartImage}" alt="课程目标支撑指标点达成情况" style="width: 8cm; height: 14cm; object-fit: fill; display: block; margin: 0 auto; page-break-inside: avoid;">
                         </div>
                         `;
                     } catch (error) {
@@ -3072,9 +3120,9 @@
                                 var individualChartImage = chart.toBase64Image('image/png', 1.0);
                                 console.log('成功获取课程目标', index + 1, '图表base64');
                                 individualChartsHtml += `
-                                <div class="text-center my-6" style="width: 100%; max-width: 600px; margin: 0 auto;">
+                                <div class="text-center my-6" style="width: 8cm; margin: 0 auto;">
                                     <h5>图2-2-${index + 1} 课程目标${index + 1}达成情况</h5>
-                                    <img src="${individualChartImage}" alt="课程目标${index + 1}达成情况" style="width: 100%; height: auto; display: block; margin: 0 auto; page-break-inside: avoid;">
+                                    <img src="${individualChartImage}" alt="课程目标${index + 1}达成情况" style="width: 8cm; height: 14cm; object-fit: fill; display: block; margin: 0 auto; page-break-inside: avoid;">
                                 </div>
                                 `;
                             } catch (error) {
@@ -3097,7 +3145,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${courseName}课程目标达成评价报告</title>
+    <!-- Microsoft Word 特定元数据，强制页面视图 -->
+    <meta name="ProgId" content="Word.Document">
+    <meta name="Generator" content="Microsoft Word 16.0">
+    <meta name="Originator" content="Microsoft Word 16.0">
+    <!-- Word 特定标记，强制页面视图 -->
+    <!--[if gte mso 9]>
+    <xml>
+        <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>100</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
+        </w:WordDocument>
+    </xml>
+    <![endif]-->
     <style>
+        /* 强制Word使用页面视图 */
+        @page {
+            size: A4;
+            margin: 2.54cm;
+        }
         * {
             font-family: "SimSun", "宋体", serif;
             line-height: 1.5;
@@ -3107,6 +3174,11 @@
             font-size: 12pt;
             margin: 20px;
             text-indent: 0;
+            /* 强制Word使用页面视图 */
+            -ms-word-wrap: break-word;
+            word-wrap: break-word;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
         }
         h1 {
             font-size: 15pt;
@@ -3208,13 +3280,10 @@
         <p>依据《${major}专业课程目标达成度评价机制与方法（试行）》进行评价。</p>
     </div>
     
-    <h2>一、课程目标与毕业要求矩阵关系图</h2>
+    <h2>一、课程目标与毕业要求矩阵关系</h2>
     <p>根据${major}专业二级师范认证标准要求，特制订该课程的课程目标如下：</p>
     
     ${generateCourseObjectivesDescriptions()}
-    
-    <h5>表1-1  ${courseName}课程目标与毕业要求的矩阵关系图</h5>
-    ${matrixTable}
     
     <h2>二、课程目标达成分析</h2>
     <h3>（一）评价依据：直接分析（课程考核的量化成绩，包括过程性考核和结果性考核）与间接分析（包括学生对于课程学习的主观评价以及教师对学生的个体评价）</h3>
@@ -3435,24 +3504,50 @@
                     // 获取期末考试题目设置
                     var examItemsElement = document.getElementById('objective-' + i + '-exam-items');
                     var examItems = '';
+                    var examItemsList = [];
                     if (examItemsElement) {
                         var rows = examItemsElement.querySelectorAll('tr');
                         if (rows.length > 0) {
-                                examItems = '<br>期末成绩：';
-                                rows.forEach(function(row, index) {
-                                    var nameInput = row.querySelector('.question-name');
-                                    var percentageInput = row.querySelectorAll('input[type="number"]')[1];
-                                    if (nameInput && percentageInput) {
-                                        var questionName = nameInput.value;
-                                        var percentage = percentageInput.value;
-                                        examItems += questionName + '（' + percentage + '%）+ ';
+                            rows.forEach(function(row, index) {
+                                var nameInput = row.querySelector('.question-name');
+                                var percentageInput = row.querySelectorAll('input[type="number"]')[1];
+                                if (nameInput && percentageInput) {
+                                    var questionName = nameInput.value;
+                                    var percentage = percentageInput.value;
+                                    // 只添加占比不为0%的题目
+                                    if (parseInt(percentage) > 0) {
+                                        examItemsList.push(questionName + '（' + percentage + '%）');
                                     }
-                                });
-                                examItems = examItems.slice(0, -2); // 移除最后的 " + "
+                                }
+                            });
+                            if (examItemsList.length > 0) {
+                                examItems = '<br>期末成绩：' + examItemsList.join(' + ');
                             }
+                        }
                     }
                     
-                    contents += '<td>平时成绩（' + dailyPercentage + '%）+' + examItems + '</td>';
+                    // 构建评价内容，只显示占比不为0%的项目
+                    var evaluationContent = '';
+                    var contentParts = [];
+                    
+                    // 只添加占比不为0%的平时成绩
+                    if (parseInt(dailyPercentage) > 0) {
+                        contentParts.push('平时成绩（' + dailyPercentage + '%）');
+                    }
+                    
+                    // 如果有占比不为0%的期末题目，添加期末成绩部分
+                    if (examItemsList.length > 0) {
+                        contentParts.push('期末成绩：' + examItemsList.join(' + '));
+                    }
+                    
+                    // 只有当有内容时才生成<td>
+                    if (contentParts.length > 0) {
+                        evaluationContent = '<td>' + contentParts.join(' + ') + '</td>';
+                    } else {
+                        evaluationContent = '<td>无</td>';
+                    }
+                    
+                    contents += evaluationContent;
                 }
                 return contents;
             }
@@ -3730,18 +3825,77 @@
             // 下载报告文件
             function downloadReport(content, filename, fileType) {
                 fileType = fileType || 'html';
-                var mimeType = fileType === 'word' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'text/html;charset=utf-8';
+                // 使用.doc扩展名而不是.docx，因为.doc对HTML内容的兼容性更好
+                var extension = fileType === 'word' ? 'doc' : 'html';
+                // 强制使用text/html MIME类型，因为我们实际上是在生成Word兼容的HTML
+                var mimeType = 'text/html;charset=utf-8';
                 var blob = new Blob([content], { type: mimeType });
                 var url = URL.createObjectURL(blob);
                 var link = document.createElement('a');
+                // 确保文件名使用正确的扩展名
+                var finalFilename = filename.replace(/\.(docx|html)$/, '.' + extension);
                 link.setAttribute('href', url);
-                link.setAttribute('download', filename);
+                link.setAttribute('download', finalFilename);
                 link.style.visibility = 'hidden';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
             }
 
+            // 为生成报告按钮添加事件监听器
+            var generateReportBtn = document.getElementById('generate-report');
+            console.log('生成报告按钮元素:', generateReportBtn);
+            
+            if (generateReportBtn) {
+                generateReportBtn.addEventListener('click', function() {
+                    console.log('生成报告按钮被点击');
+                    console.log('generateReport 函数是否存在:', typeof generateReport === 'function');
+                    
+                    // 直接调用 generateReport 函数
+                    try {
+                        generateReport();
+                        // 更新使用次数
+                        updateUsageCount();
+                        // 重新更新支付提示
+                        updatePaymentPrompt();
+                    } catch (error) {
+                        alert('生成报告时出错: ' + error.message);
+                        console.error('调用 generateReport 出错:', error);
+                    }
+                });
+            } else {
+                console.error('生成报告按钮元素未找到');
+            }
+
+            // 测试：将所有需要的函数暴露到全局作用域
+            window.generateReport = generateReport;
+            window.checkUsageCount = checkUsageCount;
+            window.updateUsageCount = updateUsageCount;
+            window.updatePaymentPrompt = updatePaymentPrompt;
+            console.log('所有必要函数已暴露到全局作用域');
+
+            // 添加测试函数
+            window.testGenerateReport = function() {
+                console.log('测试函数被调用');
+                console.log('generateReport 函数是否存在:', typeof generateReport === 'function');
+                
+                try {
+                    alert('开始测试生成报告...');
+                    generateReport();
+                    alert('报告生成测试成功！');
+                } catch (error) {
+                    alert('测试出错: ' + error.message);
+                    console.error('测试出错:', error);
+                }
+            };
+            console.log('测试函数已添加到全局作用域');
+
+            // 页面加载时更新支付提示
+            window.addEventListener('load', function() {
+                updatePaymentPrompt();
+                console.log('页面加载完成，所有函数已初始化');
+            });
+        });
     </script>
 </body>
 </html>
