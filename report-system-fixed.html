@@ -2956,7 +2956,7 @@
                     // 重新计算达成度，这会重新生成所有图表
                     calculateAchievements();
                     
-                    // 等待更长时间，确保图表完全渲染
+                    // 等待更长时间，确保个体图表完全渲染（generateIndividualObjectivesCharts内部有500ms延迟）
                     setTimeout(function() {
                         // 获取课程信息
                         var courseName = document.getElementById('course-name').value || '课程名称';
@@ -3049,7 +3049,7 @@
                         if (wasHidden) {
                             step3Content.classList.add('hidden');
                         }
-                    }, 2000); // 增加到2000ms延迟，确保图表完全渲染（包括期望值线）
+                    }, 4000); // 等待4000ms，确保个体图表完全渲染（generateIndividualObjectivesCharts内部有500ms延迟，需要足够时间）
                 }, 100); // 先等待100ms让DOM更新
             }
 
@@ -3121,8 +3121,10 @@
                 
                 // 生成个体图表HTML
                 var individualChartsHtml = '';
-                if (window.individualCharts && window.individualCharts.length > 0) {
-                    console.log('获取个体图表，数量:', window.individualCharts.length);
+                var objectiveCountForChart = document.querySelectorAll('.objective-item').length;
+                
+                if (window.individualCharts && window.individualCharts.filter(function(c) { return c != null; }).length > 0) {
+                    console.log('获取个体图表，数量:', window.individualCharts.length, '有效:', window.individualCharts.filter(function(c) { return c != null; }).length);
                     window.individualCharts.forEach(function(chart, index) {
                         if (chart) {
                             try {
@@ -3136,14 +3138,122 @@
                                 `;
                             } catch (error) {
                                 console.error('获取课程目标', index + 1, '图表失败:', error);
-                                individualChartsHtml += `<p>课程目标${index + 1}图表加载失败</p>`;
+                                individualChartsHtml += '<p>（课程目标' + (index + 1) + '图表加载失败，请在系统中查看）</p>';
                             }
-                        } else {
-                            console.log('课程目标', index + 1, '图表实例不存在');
                         }
                     });
-                } else {
-                    console.log('个体图表实例不存在');
+                }
+                
+                // 如果没有获取到任何个体图表，尝试手动用Canvas绘制简单图表
+                if (!individualChartsHtml && objectiveCountForChart > 0) {
+                    console.log('个体图表实例不存在，尝试手动绘制');
+                    stats.objectiveStats.forEach(function(objStat, index) {
+                        try {
+                            var canvas = document.createElement('canvas');
+                            canvas.width = 600;
+                            canvas.height = 400;
+                            var ctx = canvas.getContext('2d');
+                            
+                            var sortedData = objStat.achievements.slice().sort(function(a, b) { return a - b; });
+                            var n = sortedData.length;
+                            
+                            // 绘制背景
+                            ctx.fillStyle = '#ffffff';
+                            ctx.fillRect(0, 0, 600, 400);
+                            
+                            // 绘制坐标轴
+                            var margin = { top: 30, right: 30, bottom: 40, left: 50 };
+                            var w = 600 - margin.left - margin.right;
+                            var h = 400 - margin.top - margin.bottom;
+                            
+                            ctx.strokeStyle = '#333333';
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(margin.left, margin.top);
+                            ctx.lineTo(margin.left, margin.top + h);
+                            ctx.lineTo(margin.left + w, margin.top + h);
+                            ctx.stroke();
+                            
+                            // Y轴刻度
+                            ctx.fillStyle = '#333333';
+                            ctx.font = '12px sans-serif';
+                            ctx.textAlign = 'right';
+                            for (var yi = 0; yi <= 10; yi++) {
+                                var yVal = yi * 0.1;
+                                var yPos = margin.top + h - (yVal * h);
+                                ctx.fillText(yVal.toFixed(1), margin.left - 5, yPos + 4);
+                                ctx.strokeStyle = '#eeeeee';
+                                ctx.beginPath();
+                                ctx.moveTo(margin.left, yPos);
+                                ctx.lineTo(margin.left + w, yPos);
+                                ctx.stroke();
+                            }
+                            
+                            // 期望值线
+                            var expY = margin.top + h - (0.7 * h);
+                            ctx.strokeStyle = 'rgba(255, 99, 132, 1)';
+                            ctx.lineWidth = 2;
+                            ctx.setLineDash([5, 5]);
+                            ctx.beginPath();
+                            ctx.moveTo(margin.left, expY);
+                            ctx.lineTo(margin.left + w, expY);
+                            ctx.stroke();
+                            ctx.setLineDash([]);
+                            ctx.fillStyle = 'rgba(255, 99, 132, 1)';
+                            ctx.textAlign = 'left';
+                            ctx.fillText('期望值0.70', margin.left + w - 70, expY - 5);
+                            
+                            // 绘制数据折线
+                            ctx.strokeStyle = 'rgba(59, 130, 246, 1)';
+                            ctx.fillStyle = 'rgba(59, 130, 246, 0.2)';
+                            ctx.lineWidth = 2;
+                            ctx.beginPath();
+                            for (var si = 0; si < n; si++) {
+                                var xPos = margin.left + (si / (n - 1 || 1)) * w;
+                                var yPos = margin.top + h - (sortedData[si] * h);
+                                if (si === 0) ctx.moveTo(xPos, yPos);
+                                else ctx.lineTo(xPos, yPos);
+                            }
+                            ctx.stroke();
+                            
+                            // 填充区域
+                            ctx.lineTo(margin.left + w, margin.top + h);
+                            ctx.lineTo(margin.left, margin.top + h);
+                            ctx.closePath();
+                            ctx.fill();
+                            
+                            // 绘制数据点
+                            ctx.fillStyle = 'rgba(59, 130, 246, 1)';
+                            for (var si = 0; si < n; si++) {
+                                var xPos = margin.left + (si / (n - 1 || 1)) * w;
+                                var yPos = margin.top + h - (sortedData[si] * h);
+                                ctx.beginPath();
+                                ctx.arc(xPos, yPos, 3, 0, Math.PI * 2);
+                                ctx.fill();
+                            }
+                            
+                            // 标题
+                            ctx.fillStyle = '#333333';
+                            ctx.font = 'bold 14px sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.fillText('课程目标' + (index + 1) + '达成情况', 300, 20);
+                            
+                            // X轴标签
+                            ctx.font = '12px sans-serif';
+                            ctx.fillText('学生人数', margin.left + w / 2, 400 - 5);
+                            
+                            var imgData = canvas.toDataURL('image/png');
+                            individualChartsHtml += `
+                            <div class="text-center my-6" style="width: 8cm; margin: 0 auto;">
+                                <h5>图2-2-${index + 1} 课程目标${index + 1}达成情况</h5>
+                                <img src="${imgData}" alt="课程目标${index + 1}达成情况" style="width: 8cm; height: auto; display: block; margin: 0 auto; page-break-inside: avoid;">
+                            </div>
+                            `;
+                        } catch (e) {
+                            console.error('手动绘制课程目标', (index + 1), '图表失败:', e);
+                            individualChartsHtml += '<p>（课程目标' + (index + 1) + '图表绘制失败，请在系统中查看）</p>';
+                        }
+                    });
                 }
                 
                 // ========== 生成整体达成情况分析（数据驱动） ==========
