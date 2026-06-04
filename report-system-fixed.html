@@ -3080,6 +3080,15 @@
                 
                 var overallValue = stats.totalAverage.toFixed(2);
                 
+                // 获取课程目标的具体内容（供多处分析共用）
+                var objectives = document.querySelectorAll('.objective-item');
+                var objectiveContents = [];
+                objectives.forEach(function(obj, index) {
+                    var descElement = obj.querySelector('textarea');
+                    var desc = descElement ? descElement.value : '课程目标描述';
+                    objectiveContents.push(desc);
+                });
+                
                 // 生成课程目标与毕业要求矩阵关系表
                 var matrixTable = generateMatrixTable(objectiveCount);
                 
@@ -3087,7 +3096,7 @@
                 var evaluationTable = generateEvaluationTable(objectiveCount, objectiveValues);
                 
                 // 生成存在的问题及整改措施
-                var problemsAndSolutions = generateProblemsAndSolutions(stats);
+                var problemsAndSolutions = generateProblemsAndSolutions(stats, objectiveContents);
                 
                 // 生成图表HTML
                 var objectivesChartHtml = '';
@@ -3136,6 +3145,129 @@
                 } else {
                     console.log('个体图表实例不存在');
                 }
+                
+                // ========== 生成整体达成情况分析（数据驱动） ==========
+                var overallAnalysisHtml = (function() {
+                    var objVals = stats.objectiveStats.map(function(s) { return s.average; });
+                    var reachedCount = objVals.filter(function(v) { return v >= 0.70; }).length;
+                    var notReachedCount = objectiveCount - reachedCount;
+                    var maxObj = 0, minObj = 0;
+                    objVals.forEach(function(v, i) {
+                        if (v > objVals[maxObj]) maxObj = i;
+                        if (v < objVals[minObj]) minObj = i;
+                    });
+                    var maxDiff = objVals[maxObj] - objVals[minObj];
+                    
+                    var html = '<p>本课程所支撑的' + objectiveCount + '项毕业要求指标点达成情况如图2-1所示。';
+                    
+                    // 逐目标描述
+                    objVals.forEach(function(v, i) {
+                        var desc = objectiveContents[i] || ('课程目标' + (i + 1));
+                        var shortDesc = desc.length > 20 ? desc.substring(0, 20) + '…' : desc;
+                        html += '课程目标' + (i + 1) + '（' + shortDesc + '）评价值为' + v.toFixed(2);
+                        if (v >= 0.85) html += '，达到优秀水平';
+                        else if (v >= 0.70) html += '，达到合格要求';
+                        else html += '，未达到期望值0.70';
+                        html += '；';
+                    });
+                    
+                    html += '总达成评价值为' + overallValue + '。';
+                    
+                    // 综合判断
+                    if (notReachedCount === 0) {
+                        html += objectiveCount + '项课程目标均达到期望值0.70，';
+                        if (reachedCount === objectiveCount && objVals.every(function(v) { return v >= 0.85; })) {
+                            html += '且均达到优秀水平（≥0.85），表明本课程教学效果显著，能够有效支撑对应毕业要求指标点的达成。';
+                        } else {
+                            html += '表明本课程已基本实现预设的教学目标，能够有效支撑对应毕业要求指标点的达成。';
+                        }
+                    } else {
+                        html += '其中' + notReachedCount + '项课程目标未达到期望值0.70，需重点关注并加强相关教学环节的改进。';
+                    }
+                    
+                    // 目标间差异分析
+                    if (maxDiff > 0.10 && objectiveCount > 1) {
+                        html += '各课程目标间达成度差异为' + maxDiff.toFixed(2) + '，';
+                        if (maxDiff > 0.20) {
+                            html += '差异较大，课程目标' + (maxObj + 1) + '达成度最高（' + objVals[maxObj].toFixed(2) + '），课程目标' + (minObj + 1) + '最低（' + objVals[minObj].toFixed(2) + '），建议对低达成度目标的教学内容与方法进行针对性调整。';
+                        } else {
+                            html += '差异在合理范围内，各目标达成较为均衡。';
+                        }
+                    } else if (objectiveCount > 1) {
+                        html += '各课程目标达成度较为均衡，差异仅为' + maxDiff.toFixed(2) + '。';
+                    }
+                    
+                    html += '</p>';
+                    return html;
+                })();
+                
+                // ========== 生成个体达成情况分析（数据驱动） ==========
+                var individualAnalysisHtml = (function() {
+                    var allAchievements = stats.overallAchievements;
+                    var n = allAchievements.length;
+                    if (n === 0) return '<p>暂无学生个体数据。</p>';
+                    
+                    var sorted = allAchievements.slice().sort(function(a, b) { return a - b; });
+                    var minVal = sorted[0];
+                    var maxVal = sorted[n - 1];
+                    
+                    // 各区间人数统计
+                    var below70 = allAchievements.filter(function(v) { return v < 0.70; }).length;
+                    var range70_80 = allAchievements.filter(function(v) { return v >= 0.70 && v < 0.80; }).length;
+                    var range80_90 = allAchievements.filter(function(v) { return v >= 0.80 && v < 0.90; }).length;
+                    var range90_100 = allAchievements.filter(function(v) { return v >= 0.90; }).length;
+                    var above85 = allAchievements.filter(function(v) { return v >= 0.85; }).length;
+                    
+                    // 中位数
+                    var median = n % 2 === 1 ? sorted[Math.floor(n / 2)] : (sorted[n / 2 - 1] + sorted[n / 2]) / 2;
+                    
+                    // 标准差
+                    var mean = allAchievements.reduce(function(s, v) { return s + v; }, 0) / n;
+                    var variance = allAchievements.reduce(function(s, v) { return s + (v - mean) * (v - mean); }, 0) / n;
+                    var stdDev = Math.sqrt(variance);
+                    
+                    // 主体区间（覆盖中间60%学生的达成度范围）
+                    var p20Idx = Math.floor(n * 0.2);
+                    var p80Idx = Math.floor(n * 0.8);
+                    var mainLow = sorted[p20Idx].toFixed(2);
+                    var mainHigh = sorted[p80Idx].toFixed(2);
+                    
+                    var html = '<p>对' + actualStudentCount + '名学生个体的各课程目标考核情况进行定量统计分析，结果如图2-2所示。图2-2横坐标为学生人数，纵坐标为学生个体达成情况，结合附录2数据可知，';
+                    
+                    // 是否有未达标学生
+                    if (below70 === 0) {
+                        html += '所有学生的' + objectiveCount + '项课程目标达成评价值均达到0.70以上，无未达成目标的个体。';
+                    } else {
+                        html += '有' + below70 + '名学生（占比' + (below70 / n * 100).toFixed(1) + '%）未达到期望值0.70，需重点关注。';
+                    }
+                    
+                    // 分布描述
+                    html += '从分布来看，';
+                    var distributionParts = [];
+                    if (range90_100 > 0) distributionParts.push('评价值≥0.90的学生有' + range90_100 + '人（占比' + (range90_100 / n * 100).toFixed(1) + '%）');
+                    if (range80_90 > 0) distributionParts.push('0.80-0.90之间的学生有' + range80_90 + '人（占比' + (range80_90 / n * 100).toFixed(1) + '%）');
+                    if (range70_80 > 0) distributionParts.push('0.70-0.80之间的学生有' + range70_80 + '人（占比' + (range70_80 / n * 100).toFixed(1) + '%）');
+                    if (below70 > 0) distributionParts.push('低于0.70的学生有' + below70 + '人（占比' + (below70 / n * 100).toFixed(1) + '%）');
+                    
+                    if (distributionParts.length > 0) {
+                        html += distributionParts.join('，') + '；';
+                    }
+                    
+                    // 主体集中区间
+                    html += '中间60%的学生达成评价值集中在' + mainLow + '-' + mainHigh + '之间。';
+                    
+                    // 整体态势判断
+                    if (stdDev < 0.05) {
+                        html += '个体差异较小（标准差' + stdDev.toFixed(3) + '），学生整体水平较为一致，课程教学对多数学生的适配性较好。';
+                    } else if (stdDev < 0.10) {
+                        html += '个体差异适中（标准差' + stdDev.toFixed(3) + '），整体呈现中间集中、两端分散的分布态势，课程教学能够兼顾多数学生的学习需求。';
+                    } else {
+                        html += '个体差异较大（标准差' + stdDev.toFixed(3) + '，最低' + minVal.toFixed(2) + '，最高' + maxVal.toFixed(2) + '），需关注分层教学与差异化指导。';
+                    }
+                    
+                    html += '</p>';
+                    return html;
+                })();
                 
                 // 报告模板
                 var reportTemplate = `
@@ -3329,11 +3461,11 @@
     <p>课程过程性考核和期末考核详细得分数据统计表见附录1；课程目标达成明细表见附录2。</p>
     
     <h4>（1）整体达成情况：</h4>
-    <p>本课程所支撑的${objectiveCount}项毕业要求指标点达成情况如图2-1所示，${objectiveCount}项课程目标评价值均为${objectiveValues[0]}，总达成同样为${overallValue}，均远超期望值0.70，表明本课程已基本实现预设的教学目标，能够有效支撑对应毕业要求指标点的达成。</p>
+    ${overallAnalysisHtml}
     ${objectivesChartHtml}
     
     <h4>（2）个体达成情况：</h4>
-    <p>对${actualStudentCount}名学生个体的各课程目标考核情况进行定量统计分析，结果如图2-2所示。图2-2横坐标为学生人数，纵坐标为学生个体达成情况，结合附录2数据可知，所有学生的${objectiveCount}项课程目标达成评价值均达到0.70以上，无未达成目标的个体。从分布来看，大部分学生达成评价值集中在0.84-0.94之间，占比约86%；其中评价值≥0.90的学生有${Math.round(actualStudentCount * 0.2791)}人，占比27.91%，表现优秀；评价值在0.70-0.80之间的学生仅1人，占比${actualStudentCount > 0 ? (1/actualStudentCount * 100).toFixed(2) : '0'}%，为待提升群体。整体呈现"中间集中、两端分散"的合理分布态势，说明课程教学对不同层次学生的适配性较好，能够兼顾多数学生的学习需求，同时为优秀学生提供了提升空间。</p>
+    ${individualAnalysisHtml}
     ${individualChartsHtml}
     
     <h2>三、存在的问题及整改措施</h2>
@@ -3565,142 +3697,192 @@
                 return '0.325，0.35，0.325';
             }
 
-            // 生成存在的问题及整改措施
-            function generateProblemsAndSolutions(stats) {
+            // 生成存在的问题及整改措施（数据驱动）
+            function generateProblemsAndSolutions(stats, objectiveContents) {
                 console.log('generateProblemsAndSolutions 函数被调用，stats:', stats);
                 
-                // 获取课程目标的具体内容
-                var objectives = document.querySelectorAll('.objective-item');
-                var objectiveContents = [];
-                objectives.forEach(function(obj, index) {
-                    var descElement = obj.querySelector('textarea');
-                    var desc = descElement ? descElement.value : '课程目标描述';
-                    objectiveContents.push(desc);
-                });
-                
-                // 分析各课程目标的达成情况
-                var objectiveProblems = [];
-                var objectiveSolutions = [];
-                
-                stats.objectiveStats.forEach(function(objStat, index) {
-                    var objectiveIndex = index + 1;
-                    var average = objStat.average;
-                    var passRate = objStat.passRate;
-                    var excellentRate = objStat.excellentRate;
-                    var achievementCount = objStat.achievements.length;
-                    
-                    // 分析学生达成度分布
-                    var lowAchievers = objStat.achievements.filter(a => a < 0.7).length;
-                    var middleAchievers = objStat.achievements.filter(a => a >= 0.7 && a < 0.85).length;
-                    var highAchievers = objStat.achievements.filter(a => a >= 0.85).length;
-                    
-                    console.log('课程目标' + objectiveIndex + '达成度:', average, '合格率:', passRate, '优秀率:', excellentRate);
-                    console.log('低达成度学生数:', lowAchievers, '中等达成度学生数:', middleAchievers, '高达成度学生数:', highAchievers);
-                    
-                    // 获取课程目标的具体内容关键词
-                    var objectiveContent = objectiveContents[index] || '';
-                    var contentKeywords = [];
-                    if (objectiveContent.includes('基础知识')) contentKeywords.push('基础知识');
-                    if (objectiveContent.includes('实践能力')) contentKeywords.push('实践能力');
-                    if (objectiveContent.includes('综合应用')) contentKeywords.push('综合应用');
-                    if (objectiveContent.includes('创新能力')) contentKeywords.push('创新能力');
-                    if (objectiveContent.includes('分析能力')) contentKeywords.push('分析能力');
-                    if (objectiveContent.includes('解决问题')) contentKeywords.push('解决问题能力');
-                    if (contentKeywords.length === 0) contentKeywords.push('核心内容');
-                    
-                    // 根据达成度生成具体问题
-                    if (average < 0.7) {
-                        objectiveProblems.push(`课程目标${objectiveIndex}达成度偏低（${average.toFixed(2)}），具体表现为：1. 学生对${contentKeywords.join('、')}的掌握不够扎实，基础薄弱；2. ${lowAchievers}名学生（占比${(lowAchievers/achievementCount*100).toFixed(1)}%）未能达到基本要求，存在明显的学习困难；3. 学生在课堂参与度和课后作业完成质量方面表现较差，学习态度需要改进；4. 知识应用能力不足，无法将所学内容与实际情境相结合。`);
-                        objectiveSolutions.push(`针对课程目标${objectiveIndex}的具体改进措施：1. 加强${contentKeywords.join('、')}的教学，采用分层教学方法，为基础薄弱学生提供额外辅导；2. 增加课堂互动和实践环节，提高学生的参与度和学习积极性；3. 设计更加贴近实际的作业和练习，强化知识应用能力；4. 建立学习跟踪机制，定期检测学生的学习进展，及时调整教学策略。`);
-                    } else if (average < 0.85) {
-                        objectiveProblems.push(`课程目标${objectiveIndex}达成度一般（${average.toFixed(2)}），具体表现为：1. 大部分学生能够掌握基本内容，但在${contentKeywords.join('、')}的深度和广度方面有待提升；2. ${middleAchievers}名学生（占比${(middleAchievers/achievementCount*100).toFixed(1)}%）处于中等水平，需要进一步提高；3. 学生的知识迁移能力和综合应用能力较弱，难以应对复杂问题；4. 部分学生学习方法不当，缺乏自主学习能力和学习策略。`);
-                        objectiveSolutions.push(`针对课程目标${objectiveIndex}的具体改进措施：1. 深化${contentKeywords.join('、')}的教学内容，增加拓展性和挑战性任务；2. 采用项目式学习和小组合作学习等方法，培养学生的综合应用能力；3. 开展学习方法指导，帮助学生掌握有效的学习策略；4. 建立学习激励机制，鼓励学生积极参与课堂讨论和课外活动。`);
-                    } else {
-                        objectiveProblems.push(`课程目标${objectiveIndex}达成度良好（${average.toFixed(2)}），但仍存在以下问题：1. 部分学生在${contentKeywords.join('、')}的高层次应用方面有待提升，如分析、评价和创造能力；2. ${highAchievers}名学生（占比${(highAchievers/achievementCount*100).toFixed(1)}%）表现优秀，但缺乏进一步发展的空间；3. 学生对前沿知识和最新研究成果的了解不够，视野需要拓宽；4. 跨学科知识整合能力较弱，难以将不同领域的知识融会贯通。`);
-                        objectiveSolutions.push(`针对课程目标${objectiveIndex}的具体改进措施：1. 设计开放性和探究性学习任务，培养学生的高层次思维能力；2. 为优秀学生提供更具挑战性的学习内容和研究机会；3. 定期引入前沿知识和最新研究成果，拓宽学生的视野；4. 开展跨学科项目合作，提高学生的知识整合能力。`);
-                    }
-                });
-                
-                // 分析整体达成情况
-                var overallAverage = stats.totalAverage;
-                var passRate = stats.passRate;
-                var excellentRate = stats.excellentRate;
                 var studentCount = stats.overallAchievements.length;
+                if (studentCount === 0) {
+                    return { problems: '<ul><li>暂无学生数据，无法进行分析。</li></ul>', solutions: '<div></div>' };
+                }
                 
-                console.log('整体达成度:', overallAverage, '合格率:', passRate, '优秀率:', excellentRate, '学生人数:', studentCount);
+                // ====== 基础数据计算 ======
+                var sortedOverall = stats.overallAchievements.slice().sort(function(a, b) { return a - b; });
+                var overallMin = sortedOverall[0];
+                var overallMax = sortedOverall[sortedOverall.length - 1];
+                var overallMean = stats.totalAverage;
+                var overallRange = overallMax - overallMin;
                 
-                // 分析个体差异
-                var sortedAchievements = [...stats.overallAchievements].sort(function(a, b) { return a - b; });
-                var minAchievement = sortedAchievements[0];
-                var maxAchievement = sortedAchievements[sortedAchievements.length - 1];
-                var achievementRange = maxAchievement - minAchievement;
+                // 整体区间分布
+                var below70 = stats.overallAchievements.filter(function(a) { return a < 0.70; }).length;
+                var range70_85 = stats.overallAchievements.filter(function(a) { return a >= 0.70 && a < 0.85; }).length;
+                var above85 = stats.overallAchievements.filter(function(a) { return a >= 0.85; }).length;
+                var above90 = stats.overallAchievements.filter(function(a) { return a >= 0.90; }).length;
                 
-                // 分析成绩分布
-                var overallLowAchievers = stats.overallAchievements.filter(a => a < 0.7).length;
-                var overallMiddleAchievers = stats.overallAchievements.filter(a => a >= 0.7 && a < 0.85).length;
-                var overallHighAchievers = stats.overallAchievements.filter(a => a >= 0.85).length;
+                // 标准差
+                var variance = stats.overallAchievements.reduce(function(s, v) { return s + (v - overallMean) * (v - overallMean); }, 0) / studentCount;
+                var stdDev = Math.sqrt(variance);
                 
-                console.log('整体低达成度学生数:', overallLowAchievers, '中等达成度学生数:', overallMiddleAchievers, '高达成度学生数:', overallHighAchievers);
-                
-                // 生成问题列表
-                var problems = `<ul>`;
-                
-                // 添加针对各课程目标的问题
-                objectiveProblems.forEach(function(problem, index) {
-                    problems += `<li>${problem}</li>`;
+                // 各目标数据
+                var objVals = stats.objectiveStats.map(function(s) { return s.average; });
+                var maxObjIdx = 0, minObjIdx = 0;
+                objVals.forEach(function(v, i) {
+                    if (v > objVals[maxObjIdx]) maxObjIdx = i;
+                    if (v < objVals[minObjIdx]) minObjIdx = i;
                 });
                 
-                // 添加综合性问题
-                if (overallLowAchievers > 0) {
-                    problems += `<li>存在${overallLowAchievers}名学生（占比${(overallLowAchievers/studentCount*100).toFixed(1)}%）未达到基本要求，具体问题包括：1. 学习态度不端正，出勤率和作业完成率低；2. 学习基础薄弱，跟不上教学进度；3. 学习方法不当，缺乏自主学习能力；4. 对课程内容缺乏兴趣，学习动力不足。</li>`;
-                }
+                // ====== 生成问题列表 ======
+                var problems = '<ul>';
                 
-                if (overallMiddleAchievers > studentCount * 0.6) {
-                    problems += `<li>大部分学生（${overallMiddleAchievers}名，占比${(overallMiddleAchievers/studentCount*100).toFixed(1)}%）处于中等水平，具体问题包括：1. 学习目标不明确，缺乏学习动力；2. 知识掌握不够扎实，存在漏洞；3. 应用能力不足，无法将所学知识转化为实际技能；4. 缺乏学习策略，学习效率不高。</li>`;
-                }
-                
-                if (overallHighAchievers < studentCount * 0.2) {
-                    problems += `<li>优秀学生比例偏低（${overallHighAchievers}名，占比${(overallHighAchievers/studentCount*100).toFixed(1)}%），具体问题包括：1. 教学内容深度和广度不够，难以满足优秀学生的学习需求；2. 缺乏挑战性任务和拓展性学习机会；3. 评价方式单一，无法全面反映学生的能力和潜力；4. 优秀学生之间缺乏交流和合作的平台。</li>`;
-                }
-                
-                if (achievementRange > 0.4) {
-                    problems += `<li>学生个体差异较大（最低${minAchievement.toFixed(2)}，最高${maxAchievement.toFixed(2)}，差距${achievementRange.toFixed(2)}），具体问题包括：1. 学生学习基础和能力水平差异显著；2. 教学内容和方法未能充分考虑个体差异；3. 学习资源分配不均，部分学生获得的支持不足；4. 班级整体学习氛围受到影响，难以形成良好的学习共同体。</li>`;
-                }
-                
-                // 分析学习投入情况
-                problems += `<li>学习投入与产出不匹配，具体问题包括：1. 部分学生课堂参与度低，缺乏主动思考和提问；2. 课后复习和预习不充分，知识巩固效果不佳；3. 学习资源利用不足，如教材、参考资料和在线资源；4. 缺乏学习反思和总结，难以形成有效的知识体系。</li>`;
-                
-                problems += `</ul>`;
-                
-                // 生成整改措施列表
-                var solutions = `<div>`;
-                
-                // 添加针对各课程目标的整改措施
-                objectiveSolutions.forEach(function(solution, index) {
-                    solutions += `<p>${solution}</p>`;
+                // 1. 各课程目标达成情况问题
+                stats.objectiveStats.forEach(function(objStat, index) {
+                    var i = index + 1;
+                    var avg = objStat.average;
+                    var desc = objectiveContents[index] || ('课程目标' + i);
+                    var shortDesc = desc.length > 25 ? desc.substring(0, 25) + '…' : desc;
+                    
+                    var lowN = objStat.achievements.filter(function(a) { return a < 0.70; }).length;
+                    var midN = objStat.achievements.filter(function(a) { return a >= 0.70 && a < 0.85; }).length;
+                    var highN = objStat.achievements.filter(function(a) { return a >= 0.85; }).length;
+                    var n = objStat.achievements.length;
+                    
+                    var pText = '课程目标' + i + '（' + shortDesc + '）达成度为' + avg.toFixed(2) + '，';
+                    
+                    if (avg < 0.70) {
+                        pText += '未达到期望值0.70。';
+                        if (lowN > 0) pText += '其中' + lowN + '名学生（占比' + (lowN / n * 100).toFixed(1) + '%）达成度低于0.70，';
+                        if (midN > 0) pText += midN + '名学生（占比' + (midN / n * 100).toFixed(1) + '%）处于0.70-0.85之间，';
+                        pText += '表明该目标对应的教学内容掌握情况不理想，学生普遍存在理解困难或应用能力不足的问题。';
+                    } else if (avg < 0.85) {
+                        pText += '达到合格要求但低于优秀水平（0.85）。';
+                        if (lowN > 0) pText += lowN + '名学生（占比' + (lowN / n * 100).toFixed(1) + '%）未达到0.70，';
+                        pText += midN + '名学生（占比' + (midN / n * 100).toFixed(1) + '%）集中在0.70-0.85之间，';
+                        pText += '说明多数学生能够掌握基本内容，但在深度理解和灵活应用方面仍有欠缺。';
+                    } else {
+                        pText += '达到优秀水平。';
+                        if (lowN > 0) {
+                            pText += '但仍有' + lowN + '名学生（占比' + (lowN / n * 100).toFixed(1) + '%）低于0.70，需关注这部分学生的学习困难。';
+                        } else if (midN > 0) {
+                            pText += midN + '名学生（占比' + (midN / n * 100).toFixed(1) + '%）处于0.70-0.85之间，整体表现良好但部分学生仍有提升空间。';
+                        } else {
+                            pText += '所有学生均达到0.85以上，该目标教学效果优异。';
+                        }
+                    }
+                    
+                    problems += '<li>' + pText + '</li>';
                 });
                 
-                // 添加综合性整改措施
-                if (overallLowAchievers > 0) {
-                    solutions += `<p>针对未达基本要求学生的改进措施：1. 建立学习预警机制，及时识别和帮助学习困难学生；2. 开展一对一辅导，针对学生的具体问题提供个性化帮助；3. 设计基础强化课程，帮助学生补齐知识漏洞；4. 加强学习动机激发，帮助学生建立学习信心和目标。</p>`;
+                // 2. 未达标学生问题
+                if (below70 > 0) {
+                    var pText = '有' + below70 + '名学生（占比' + (below70 / studentCount * 100).toFixed(1) + '%）整体达成度低于期望值0.70。';
+                    // 进一步分析这些学生在哪些目标上表现最差
+                    var weakObjectives = [];
+                    stats.objectiveStats.forEach(function(objStat, index) {
+                        var lowInObj = objStat.achievements.filter(function(a) { return a < 0.70; }).length;
+                        if (lowInObj > 0) {
+                            var desc = objectiveContents[index] || ('课程目标' + (index + 1));
+                            weakObjectives.push('课程目标' + (index + 1) + '有' + lowInObj + '人未达标');
+                        }
+                    });
+                    if (weakObjectives.length > 0) {
+                        pText += '未达标学生在' + weakObjectives.join('、') + '方面表现薄弱，需针对薄弱环节提供额外辅导和练习。';
+                    }
+                    problems += '<li>' + pText + '</li>';
                 }
                 
-                if (overallMiddleAchievers > studentCount * 0.6) {
-                    solutions += `<p>针对中等水平学生的改进措施：1. 设立分层学习目标，鼓励学生逐步提升；2. 提供进阶学习资源，满足学生的学习需求；3. 开展学习方法培训，帮助学生掌握有效的学习策略；4. 建立学习小组，促进学生之间的相互学习和交流。</p>`;
+                // 3. 课程目标间差异问题
+                if (objVals.length > 1) {
+                    var maxDiff = objVals[maxObjIdx] - objVals[minObjIdx];
+                    if (maxDiff > 0.10) {
+                        var pText = '各课程目标达成度存在差异，课程目标' + (maxObjIdx + 1) + '达成度最高（' + objVals[maxObjIdx].toFixed(2) + '），课程目标' + (minObjIdx + 1) + '最低（' + objVals[minObjIdx].toFixed(2) + '），差距为' + maxDiff.toFixed(2) + '。';
+                        if (maxDiff > 0.20) {
+                            pText += '差距较大，表明各目标对应的教学效果不均衡，需重点关注低达成度目标的教学设计与方法改进。';
+                        } else {
+                            pText += '差距在可接受范围内，但仍建议适当加强低达成度目标的教学投入。';
+                        }
+                        problems += '<li>' + pText + '</li>';
+                    }
                 }
                 
-                if (overallHighAchievers < studentCount * 0.2) {
-                    solutions += `<p>针对优秀学生的改进措施：1. 开发拓展性课程模块，为优秀学生提供更具挑战性的学习内容；2. 设立学科竞赛和创新项目，鼓励学生积极参与；3. 建立导师制，为优秀学生提供个性化的学术指导；4. 组织学术讲座和研讨活动，拓宽学生的学术视野。</p>`;
+                // 4. 个体差异问题
+                if (overallRange > 0.30) {
+                    var pText = '学生个体差异较大（最低' + overallMin.toFixed(2) + '，最高' + overallMax.toFixed(2) + '，极差' + overallRange.toFixed(2) + '），';
+                    if (stdDev > 0.10) {
+                        pText += '标准差为' + stdDev.toFixed(3) + '，说明学生之间的学习水平参差不齐，统一教学进度可能无法兼顾不同层次学生的需求，需考虑分层教学或差异化指导。';
+                    } else {
+                        pText += '但大部分学生集中在中等水平，少数极端值拉大了极差。';
+                    }
+                    problems += '<li>' + pText + '</li>';
                 }
                 
-                if (achievementRange > 0.4) {
-                    solutions += `<p>针对个体差异较大的改进措施：1. 实施差异化教学，根据学生的学习能力和需求调整教学内容和方法；2. 建立个性化学习计划，为每个学生制定适合的学习路径；3. 丰富学习资源，提供多层次的学习材料；4. 加强班级建设，营造互帮互助的学习氛围。</p>`;
+                // 5. 优秀率偏低问题
+                if (above85 < studentCount * 0.3 && above85 > 0) {
+                    problems += '<li>优秀学生（达成度≥0.85）占比为' + (above85 / studentCount * 100).toFixed(1) + '%，比例偏低，说明多数学生虽达到基本要求但尚未形成扎实的掌握和灵活的运用能力，教学内容和方法有进一步优化的空间。</li>';
                 }
                 
-                // 添加通用整改措施
-                solutions += `<p>通用改进措施：1. 优化课程设计，根据课程目标的具体要求调整教学内容和方法；2. 加强课堂教学改革，采用多种教学方法提高学生的参与度和学习效果；3. 完善评价体系，采用多元化的评价方式全面反映学生的学习成果；4. 加强学习支持服务，为学生提供全方位的学习帮助；5. 建立教学反馈机制，定期收集学生的意见和建议，持续改进教学质量；6. 利用现代教育技术，丰富教学手段，提高教学效率和效果；7. 加强与其他课程的衔接，形成完整的课程体系，促进知识的融会贯通。</p>`;
+                // 6. 集中在中段的问题
+                if (range70_85 > studentCount * 0.5 && below70 === 0) {
+                    problems += '<li>超过半数学生（' + range70_85 + '人，占比' + (range70_85 / studentCount * 100).toFixed(1) + '%）达成度集中在0.70-0.85之间，虽全部达标但普遍未达到优秀水平，说明学生对课程内容的掌握停留在"基本理解"层面，缺乏深度思考和综合应用能力。</li>';
+                }
                 
-                solutions += `</div>`;
+                problems += '</ul>';
+                
+                // ====== 生成整改措施列表 ======
+                var solutions = '<div>';
+                
+                // 1. 针对各课程目标的改进措施
+                stats.objectiveStats.forEach(function(objStat, index) {
+                    var i = index + 1;
+                    var avg = objStat.average;
+                    var desc = objectiveContents[index] || ('课程目标' + i);
+                    var shortDesc = desc.length > 25 ? desc.substring(0, 25) + '…' : desc;
+                    var lowN = objStat.achievements.filter(function(a) { return a < 0.70; }).length;
+                    var midN = objStat.achievements.filter(function(a) { return a >= 0.70 && a < 0.85; }).length;
+                    var n = objStat.achievements.length;
+                    
+                    var sText = '针对课程目标' + i + '（' + shortDesc + '）的改进措施：';
+                    
+                    if (avg < 0.70) {
+                        sText += '1. 重新审视该目标对应教学内容的设计，确认知识点的覆盖和难度是否合理；2. 增加针对性练习和案例分析，帮助学生建立知识与应用之间的联系；3. 对' + lowN + '名未达标学生进行个别辅导，了解其具体困难并给予针对性帮助；4. 在后续教学中适当放慢进度，确保基础内容的充分消化。';
+                    } else if (avg < 0.85) {
+                        sText += '1. 在现有教学内容基础上增加拓展性和综合性任务，引导学生从"了解"走向"应用"；2. 通过课堂讨论、小组合作等方式促进学生对' + shortDesc + '的深度理解；3. 对' + midN + '名中等水平学生设置进阶目标，鼓励其向优秀水平提升；4. 加强课后练习的反馈力度，帮助学生及时发现和纠正理解偏差。';
+                    } else {
+                        if (lowN > 0) {
+                            sText += '1. 关注' + lowN + '名低达成度学生，分析其学习困难的具体原因并给予针对性辅导；2. 对已达标学生，可引入更高层次的分析与评价任务，进一步激发学习潜力。';
+                        } else {
+                            sText += '该目标达成度良好，建议在保持现有教学方式的基础上，适当引入前沿内容和开放性问题，拓宽学生视野。';
+                        }
+                    }
+                    
+                    solutions += '<p>' + sText + '</p>';
+                });
+                
+                // 2. 针对未达标学生的改进措施
+                if (below70 > 0) {
+                    solutions += '<p>针对' + below70 + '名未达标学生的改进措施：1. 建立学习跟踪档案，定期了解其学习状态和困难点；2. 安排课后答疑或学习小组，通过同伴互助提升学习效果；3. 与学生逐一沟通，了解其学习态度、时间投入和方法方面的具体问题；4. 适当降低作业难度梯度，帮助其逐步建立学习信心。</p>';
+                }
+                
+                // 3. 针对目标间差异的改进措施
+                if (objVals.length > 1 && (objVals[maxObjIdx] - objVals[minObjIdx]) > 0.10) {
+                    var lowDesc = objectiveContents[minObjIdx] || ('课程目标' + (minObjIdx + 1));
+                    var shortLowDesc = lowDesc.length > 25 ? lowDesc.substring(0, 25) + '…' : lowDesc;
+                    solutions += '<p>针对课程目标间达成度不均衡的改进措施：1. 重点加强' + shortLowDesc + '相关内容的教学设计，借鉴高达成度目标的教学经验；2. 调整各目标的课时分配和练习量，确保低达成度目标获得充分的教学支持；3. 在教学中注重各目标间的知识衔接，帮助学生建立完整的知识体系。</p>';
+                }
+                
+                // 4. 针对个体差异的改进措施
+                if (overallRange > 0.30 || stdDev > 0.10) {
+                    solutions += '<p>针对学生个体差异较大的改进措施：1. 实施分层教学，根据学生水平设计不同难度的学习任务；2. 建立学习互助小组，让高达成度学生带动低达成度学生；3. 提供多层次的学习资源，满足不同水平学生的学习需求；4. 定期进行形成性评价，及时发现和干预学习困难学生。</p>';
+                }
+                
+                // 5. 针对优秀率偏低的改进措施
+                if (above85 < studentCount * 0.3 && above85 > 0) {
+                    solutions += '<p>针对优秀率偏低的改进措施：1. 在课堂教学中增设开放性问题和探究性任务，培养学生的高阶思维能力；2. 布置分层作业，为基础较好的学生提供更有挑战性的练习；3. 鼓励学生参与学科竞赛、课题研究等拓展性学习活动；4. 优化评价方式，在知识考核之外增加能力导向的评价维度。</p>';
+                }
+                
+                // 6. 通用改进措施
+                solutions += '<p>通用改进措施：1. 根据本次达成度分析结果，在下一轮教学中针对性调整教学内容和方法；2. 加强过程性评价，通过课堂提问、随堂测验等方式及时了解学生学习状况；3. 建立师生沟通反馈机制，定期收集学生对课程教学的意见，持续改进教学质量；4. 注重课程内容与实际教育场景的结合，提升学生的知识应用能力。</p>';
+                
+                solutions += '</div>';
                 
                 console.log('生成的问题:', problems);
                 console.log('生成的整改措施:', solutions);
