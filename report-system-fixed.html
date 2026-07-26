@@ -95,7 +95,6 @@
             <h1 class="text-2xl font-bold text-primary">课程目标达成度分析报告生成系统3.0</h1>
             <div class="flex items-center">
                 <span id="current-mode-badge" class="ml-4 px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700 hidden">功能一：生成问卷</span>
-                <span id="user-status-badge" class="ml-4 px-3 py-1 rounded-full text-sm font-medium hidden"></span>
                 <button id="back-to-home" class="ml-4 text-sm text-gray-500 hover:text-primary hidden" onclick="backToHome()">← 返回功能选择</button>
                 <span id="current-date" class="ml-4 text-gray-600"></span>
             </div>
@@ -105,55 +104,10 @@
     <!-- 欢迎页 -->
     <div id="welcome-screen" class="min-h-screen flex items-center justify-center py-16 px-4">
         <div class="max-w-4xl w-full">
-            <!-- 初始选择：访客/用户 -->
-            <div id="welcome-entry">
+            <!-- 功能选择 -->
+            <div id="welcome-mode-select">
                 <h2 class="text-3xl font-bold text-center text-primary mb-2">欢迎使用</h2>
-                <p class="text-center text-gray-500 mb-10">请选择访问方式</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-                    <div class="cursor-pointer border-2 border-gray-300 bg-white rounded-xl p-8 transition-all hover:shadow-xl hover:border-blue-400" onclick="showLoginPanel()">
-                        <div class="text-center">
-                            <div class="text-5xl mb-4">🔐</div>
-                            <h3 class="text-xl font-bold text-gray-800 mb-3">用户登录</h3>
-                            <p class="text-sm text-gray-500">输入账号密码，可生成分析报告</p>
-                            <p class="text-sm text-green-600 mt-2">✅ 可生成问卷题目</p>
-                            <p class="text-sm text-green-600 mt-1">✅ 可生成分析报告（每账号限2次）</p>
-                        </div>
-                    </div>
-                    <div class="cursor-pointer border-2 border-gray-300 bg-white rounded-xl p-8 transition-all hover:shadow-xl hover:border-green-400" onclick="enterAsVisitor()">
-                        <div class="text-center">
-                            <div class="text-5xl mb-4">👁️</div>
-                            <h3 class="text-xl font-bold text-gray-800 mb-3">访客模式</h3>
-                            <p class="text-sm text-gray-500">浏览系统功能、上传文件熟悉操作</p>
-                            <p class="text-sm text-green-600 mt-2">✅ 可生成问卷题目</p>
-                            <p class="text-sm text-gray-400 mt-1">❌ 不可生成分析报告</p>
-                        </div>
-                    </div>
-                </div>
-                <p class="text-center text-gray-400 text-sm mt-8">我的目标是：5分钟搞定期末材料。</p>
-                <p class="text-center text-gray-400 text-sm mt-2">如需账号密码，可联系黎琳。💵</p>
-            </div>
-            <div id="login-panel" class="hidden max-w-md mx-auto">
-                <h2 class="text-3xl font-bold text-center text-primary mb-2">用户登录</h2>
-                <p class="text-center text-gray-500 mb-8">请输入账号和密码</p>
-                <div class="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">账号</label>
-                        <input type="text" id="login-username" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="请输入账号">
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">密码</label>
-                        <input type="password" id="login-password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="请输入密码">
-                    </div>
-                    <p id="login-error" class="hidden text-sm text-red-600 mb-3"></p>
-                    <button onclick="loginUser()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">登录</button>
-                    <button onclick="showWelcomeEntry()" class="w-full mt-3 text-gray-500 py-2 rounded-lg hover:bg-gray-100 transition-colors text-sm">← 返回</button>
-                </div>
-            </div>
-
-            <!-- 功能选择（登录/访客后显示） -->
-            <div id="welcome-mode-select" class="hidden">
-                <h2 class="text-3xl font-bold text-center text-primary mb-2">请选择功能</h2>
-                <p class="text-center text-gray-500 mb-10">选择您需要使用的功能，进入对应操作界面</p>
+                <p class="text-center text-gray-500 mb-10">请选择功能</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div id="mode-1-card" class="mode-card cursor-pointer border-2 border-gray-300 bg-white rounded-xl p-8 transition-all hover:shadow-xl hover:border-blue-400" onclick="switchMode(1)">
                         <div class="text-center">
@@ -170,9 +124,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="text-center mt-8">
-                    <button onclick="logoutToWelcome()" class="text-sm text-gray-400 hover:text-gray-600">退出登录</button>
-                </div>
+                <p class="text-center text-gray-400 text-sm mt-8">抖音3961 🛰️Jeidhshifjdks</p>
+                <p class="text-center text-gray-400 text-sm mt-2">如有使用问题，以上可找到我⬆️</p>
             </div>
         </div>
     </div>
@@ -261,6 +214,44 @@
             </div>
         </div>
 
+        <!-- 功能一导航栏 -->
+        <div id="mode1-nav" class="hidden flex flex-wrap mb-8 border-b border-gray-200">
+            <button class="mode1-nav-btn step-btn px-6 py-3 font-medium text-primary border-b-2 border-primary" data-step="1">
+                1. 导入命题计划
+            </button>
+            <button class="mode1-nav-btn step-btn px-6 py-3 font-medium text-gray-500 hover:text-primary" data-step="2">
+                2. 生成调查问卷
+            </button>
+        </div>
+
+        <!-- 功能一快捷上传 -->
+        <div id="mode1-quick-upload" class="hidden bg-white rounded-lg p-6 card-shadow mb-8 border-2 border-blue-200">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-primary">🚀 快捷上传</h2>
+                <button id="mode1-qu-toggle" class="text-gray-400 hover:text-gray-600 text-sm">收起 ▲</button>
+            </div>
+            <div id="mode1-qu-body">
+                <p class="text-gray-600 text-sm mb-4">上传命题计划文件，系统自动提取课程信息和课程目标，直接跳转到生成问卷。</p>
+                <div class="grid grid-cols-1 gap-4 mb-4">
+                    <!-- 命题计划 -->
+                    <div id="mode1-qu-zone-1" class="mode1-qu-zone border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                        <input type="file" id="mode1-qu-file-1" class="hidden" accept=".doc,.docx,.xlsx,.xls,.csv">
+                        <div class="qu-icon text-3xl mb-2">📄</div>
+                        <div class="text-sm font-medium text-gray-700">命题计划</div>
+                        <div class="mode1-qu-filename text-xs text-gray-400 mt-1">点击选择或拖入</div>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <button id="mode1-qu-start" class="bg-blue-600 text-white px-8 py-3 rounded-md hover:bg-blue-700 transition-colors font-medium">
+                        ⚡ 一键处理
+                    </button>
+                    <button id="mode1-qu-reset" class="border border-gray-300 text-gray-600 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors text-sm">
+                        重置
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- 步骤1：课程信息与目标设置 -->
         <div class="step-content" id="step-1">
             <div class="bg-white rounded-lg p-6 card-shadow mb-8">
@@ -271,27 +262,27 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-gray-700 mb-2">课程名称</label>
-                        <input type="text" id="course-name" value="《学前儿童健康教育》" 
+                        <input type="text" id="course-name" value="" placeholder="请输入课程名称"
                                class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">
                     </div>
                     <div>
                         <label class="block text-gray-700 mb-2">班级</label>
-                        <input type="text" id="class-name" value="2023级" 
+                        <input type="text" id="class-name" value="" placeholder="请输入班级"
                                class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">
                     </div>
                     <div>
                         <label class="block text-gray-700 mb-2">学生人数</label>
-                        <input type="number" id="student-count" value="90" min="1"
+                        <input type="number" id="student-count" value="" min="1" placeholder="请输入学生人数"
                                class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">
                     </div>
                     <div>
                         <label class="block text-gray-700 mb-2">评价人</label>
-                        <input type="text" id="evaluator" value="黎琳"
+                        <input type="text" id="evaluator" value="" placeholder="请输入评价人"
                                class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">
                     </div>
                     <div>
                         <label class="block text-gray-700 mb-2">专业</label>
-                        <input type="text" id="major" value="学前教育" 
+                        <input type="text" id="major" value="" placeholder="请输入专业"
                                class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">
                     </div>
 
@@ -308,12 +299,12 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-gray-700 mb-2">目标描述</label>
-                                <textarea id="objective-1-desc" rows="3" 
-                                          class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">通过本课程学习，学生能够系统掌握学前儿童健康教育的自然科学、人文社会科学基础知识，深入理解中华优秀传统文化在健康教育中的渗透方式，熟练掌握幼儿身心发展特点、规律及常见问题应对策略，精准把握幼儿园健康教育的目标、任务与原则，全面熟知幼儿日常保健、疾病预防及意外伤害处理知识，具备扎实的健康、语言、社会、科学、艺术等领域教育基本知识，能够在教育实践中综合运用各领域知识实现活动内容的有效渗透，形成深厚的人文底蕴、科学精神与审美能力，为开展高质量的学前儿童健康教育奠定坚实基础。</textarea>
+                                <textarea id="objective-1-desc" rows="3" placeholder="请输入课程目标1的描述"
+                                          class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus"></textarea>
                             </div>
                             <div>
                                 <label class="block text-gray-700 mb-2">对应毕业要求指标点</label>
-                                <input type="text" id="objective-1-requirement" value="毕业要求3：保教知识【M】"
+                                <input type="text" id="objective-1-requirement" value="" placeholder="如：毕业要求3：保教知识【M】"
                                        class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">
                             </div>
 
@@ -330,12 +321,12 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-gray-700 mb-2">目标描述</label>
-                                <textarea id="objective-2-desc" rows="3" 
-                                          class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">学生能够依据幼儿身心发展规律及学习特点，合理设计与高效利用幼儿身边的活动材料与空间，创设适宜的健康教育环境；熟练掌握设计幼儿生活、游戏、学习及劳动活动计划与方案的方法，具备实施领域整合和融合教育的能力；能够充分挖掘和利用民族文化资源，设计并开展具有特色的幼儿园民族文化健康教育课程；精准观察、深入分析幼儿在园一日生活中的健康行为表现，正确记录、科学分析和客观评价幼儿的游戏、学习行为，有效解决幼儿在健康游戏、学习和生活过程中的实践问题，同时能够对教育行为进行及时评价与深刻反思，熟悉并掌握幼儿园健康教育教研活动的要求、方法和策略。</textarea>
+                                <textarea id="objective-2-desc" rows="3" placeholder="请输入课程目标2的描述"
+                                          class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus"></textarea>
                             </div>
                             <div>
                                 <label class="block text-gray-700 mb-2">对应毕业要求指标点</label>
-                                <input type="text" id="objective-2-requirement" value="毕业要求4：保教能力【H】"
+                                <input type="text" id="objective-2-requirement" value="" placeholder="如：毕业要求4：保教能力【H】"
                                        class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">
                             </div>
 
@@ -352,12 +343,12 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-gray-700 mb-2">目标描述</label>
-                                <textarea id="objective-3-desc" rows="3" 
-                                          class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">学生牢固树立幼儿为本、德育为先的健康教育理念，清晰了解幼儿社会性与情感发展规律和个性特征，强化教书育人意识，深刻理解活动育人的价值，能够在健康教育活动中自然融入主流价值；具备较强的心理健康教育意识，熟练掌握幼儿心理健康教育的基本知识与方法，积极参与幼儿心理健康等活动；基于幼儿身心发展特点与学习规律，科学合理设计育人目标、活动主题与内容，充分认识环境、园所文化、一日生活、日常生活劳动等课程资源的育人价值；善于捕捉多种教育契机，对幼儿开展随机健康教育，有效培养幼儿良好的生活习惯与亲社会行为；能够综合协调幼儿园、家庭和社区各种资源，实现高效合作，全面落实育人任务，熟练掌握开展幼儿园、家庭和社区协同健康教育活动的方式方法，顺利开展幼儿园与小学健康习惯培养的衔接工作。</textarea>
+                                <textarea id="objective-3-desc" rows="3" placeholder="请输入课程目标3的描述"
+                                          class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus"></textarea>
                             </div>
                             <div>
                                 <label class="block text-gray-700 mb-2">对应毕业要求指标点</label>
-                                <input type="text" id="objective-3-requirement" value="毕业要求6：综合育人【L】"
+                                <input type="text" id="objective-3-requirement" value="" placeholder="如：毕业要求6：综合育人【L】"
                                        class="w-full px-4 py-2 border border-gray-300 rounded-md form-input-focus">
                             </div>
 
@@ -368,9 +359,6 @@
                 </div>
 
                 <div class="flex justify-end mt-8 space-x-4">
-                    <button id="import-objectives" class="border-2 border-red-500 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors">
-                        导入命题计划
-                    </button>
                     <input type="file" id="objectives-file" accept=".csv,.doc,.docx,.xlsx,.xls" class="hidden">
                     <button id="add-objective" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors">
                         添加课程目标
@@ -398,11 +386,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-gray-700 mb-2">期末成绩总占比（%）</label>
-                            <input type="number" id="global-exam-percentage" class="w-full px-4 py-2 border-2 border-red-500 rounded-md form-input-focus" value="60" min="0" max="100">
+                            <input type="number" id="global-exam-percentage" class="w-full px-4 py-2 border-2 border-red-500 rounded-md form-input-focus" value="" placeholder="如：60" min="0" max="100">
                         </div>
                         <div>
                             <label class="block text-gray-700 mb-2">平时成绩总占比（%）</label>
-                            <input type="number" id="global-daily-percentage" class="w-full px-4 py-2 border-2 border-red-500 rounded-md form-input-focus" value="40" min="0" max="100">
+                            <input type="number" id="global-daily-percentage" class="w-full px-4 py-2 border-2 border-red-500 rounded-md form-input-focus" value="" placeholder="如：40" min="0" max="100">
                         </div>
                     </div>
                 <p class="mt-2 text-sm text-gray-600">注：期末成绩占比和平时成绩占比之和应为100%</p>
@@ -428,36 +416,6 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200" id="global-exam-items">
-                            <tr>
-                                <td class="px-4 py-2"><span class="global-question-name font-medium">第1题</span></td>
-                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md global-question-score" value="5"></td>
-                                <td class="px-4 py-2"><button type="button" class="delete-global-question-btn text-red-500 hover:text-red-600 text-sm">删除</button></td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-2"><span class="global-question-name font-medium">第2题</span></td>
-                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md global-question-score" value="5"></td>
-                                <td class="px-4 py-2"><button type="button" class="delete-global-question-btn text-red-500 hover:text-red-600 text-sm">删除</button></td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-2"><span class="global-question-name font-medium">第3题</span></td>
-                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md global-question-score" value="10"></td>
-                                <td class="px-4 py-2"><button type="button" class="delete-global-question-btn text-red-500 hover:text-red-600 text-sm">删除</button></td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-2"><span class="global-question-name font-medium">第4题</span></td>
-                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md global-question-score" value="35"></td>
-                                <td class="px-4 py-2"><button type="button" class="delete-global-question-btn text-red-500 hover:text-red-600 text-sm">删除</button></td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-2"><span class="global-question-name font-medium">第5题</span></td>
-                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md global-question-score" value="5"></td>
-                                <td class="px-4 py-2"><button type="button" class="delete-global-question-btn text-red-500 hover:text-red-600 text-sm">删除</button></td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-2"><span class="global-question-name font-medium">第6题</span></td>
-                                <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md global-question-score" value="40"></td>
-                                <td class="px-4 py-2"><button type="button" class="delete-global-question-btn text-red-500 hover:text-red-600 text-sm">删除</button></td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -471,7 +429,7 @@
                     
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2">平时成绩占比（%）</label>
-                        <input type="number" id="objective-1-daily-percentage" class="w-full px-4 py-2 border-2 border-red-500 rounded-md form-input-focus" value="50" min="0" max="100">
+                        <input type="number" id="objective-1-daily-percentage" class="w-full px-4 py-2 border-2 border-red-500 rounded-md form-input-focus" value="" placeholder="如：50" min="0" max="100">
                     </div>
                     
                     <div>
@@ -489,31 +447,6 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200" id="objective-1-exam-items">
-                                    <tr>
-                                        <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第一题" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第一题" value="5" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md" value="80"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第二题" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第二题" value="5" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md" value="100"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第三题" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第三题" value="10" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md" value="100"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第四题" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第四题" value="35" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md" value="57"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第五题" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第五题" value="5" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md" value="100"></td>
-                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -527,7 +460,7 @@
                     
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2">平时成绩占比（%）</label>
-                        <input type="number" id="objective-2-daily-percentage" class="w-full px-4 py-2 border-2 border-red-500 rounded-md form-input-focus" value="50" min="0" max="100">
+                        <input type="number" id="objective-2-daily-percentage" class="w-full px-4 py-2 border-2 border-red-500 rounded-md form-input-focus" value="" placeholder="如：50" min="0" max="100">
                     </div>
                     
                     <div>
@@ -545,16 +478,6 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200" id="objective-2-exam-items">
-                                    <tr>
-                                        <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第四题" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第四题" value="35" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md" value="43"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第六题" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第六题" value="40" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md" value="25"></td>
-                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -568,7 +491,7 @@
                     
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2">平时成绩占比（%）</label>
-                        <input type="number" id="objective-3-daily-percentage" class="w-full px-4 py-2 border-2 border-red-500 rounded-md form-input-focus" value="50" min="0" max="100">
+                        <input type="number" id="objective-3-daily-percentage" class="w-full px-4 py-2 border-2 border-red-500 rounded-md form-input-focus" value="" placeholder="如：50" min="0" max="100">
                     </div>
                     
                     <div>
@@ -586,16 +509,6 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200" id="objective-3-exam-items">
-                                    <tr>
-                                        <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第一题" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第一题" value="5" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md" value="20"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-4 py-2"><input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md question-name" value="第六题" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md question-score" data-question="第六题" value="40" readonly></td>
-                                        <td class="px-4 py-2"><input type="number" class="w-full px-3 py-2 border-2 border-red-500 rounded-md" value="75"></td>
-                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -784,15 +697,12 @@
                     <div id="mode1-questionnaire" class="mb-6 p-6 bg-gray-50 border border-gray-200 rounded-md">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-semibold">课程目标达成情况学生主观评价调查问卷</h3>
-                            <button id="back-to-course-info" class="hidden text-sm text-blue-600 hover:text-blue-800" onclick="if(currentMode===1){document.getElementById('step-4').classList.add('hidden');document.getElementById('step-1').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});}">← 返回课程信息</button>
+                            <button id="back-to-course-info" class="hidden text-sm text-blue-600 hover:text-blue-800" onclick="if(currentMode===1){document.getElementById('step-4').classList.add('hidden');document.getElementById('step-1').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});if(typeof updateMode1Nav==='function')updateMode1Nav();}">← 返回课程信息</button>
                         </div>
                         <p class="text-gray-600 mb-4">点击"AI生成调查问卷"后，系统会根据课程目标和课程信息生成AI提示词，你复制到免费AI网页获取个性化问卷题目后粘贴回来。问卷采用五级量表（完全符合～完全不符合），学生填写后可导入结果用于定性评价分析。也可跳过AI使用默认模板生成。</p>
                         <div class="flex space-x-4 mb-4 flex-wrap gap-2">
                             <button id="generate-questionnaire" class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors">
                                 AI生成调查问卷
-                            </button>
-                            <button id="download-questionnaire" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors hidden">
-                                下载问卷
                             </button>
                             <button id="publish-questionnaire" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors hidden">
                                 一键发布
@@ -839,12 +749,10 @@
                         下一步：生成分析报告
                     </button>
                 </div>
-                <!-- 模式1：切换到功能二按钮 -->
-                <div id="mode1-next-step" class="hidden mt-8 p-6 bg-blue-50 border-2 border-blue-300 rounded-lg text-center">
-                    <p class="text-blue-800 font-medium mb-3">✅ 问卷已生成！请下载或发布问卷，收集学生填写结果。</p>
-                    <p class="text-gray-600 text-sm mb-4">问卷收集完成后，点击下方按钮进入功能二，上传成绩等材料并生成分析报告。</p>
-                    <button onclick="switchMode(2)" class="bg-blue-600 text-white px-8 py-3 rounded-md hover:bg-blue-700 transition-colors font-medium">
-                        进入功能二：生成报告 →
+                <!-- 模式1：一键发布按钮 -->
+                <div id="mode1-next-step" class="hidden mt-8 text-center">
+                    <button id="mode1-publish-btn" onclick="document.getElementById('publish-questionnaire').click()" class="bg-green-600 text-white px-8 py-3 rounded-md hover:bg-green-700 transition-colors font-medium">
+                        一键发布问卷
                     </button>
                 </div>
             </div>
@@ -912,6 +820,115 @@
     <!-- JavaScript -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // ===== 功能一快捷上传 =====
+            var mode1QuFile = null;
+            var mode1QuZone = document.getElementById('mode1-qu-zone-1');
+            var mode1QuInput = document.getElementById('mode1-qu-file-1');
+            var mode1QuFilename = mode1QuZone ? mode1QuZone.querySelector('.mode1-qu-filename') : null;
+
+            if (mode1QuZone) {
+                mode1QuZone.addEventListener('click', function(e) {
+                    if (e.target !== mode1QuInput) mode1QuInput.click();
+                });
+                mode1QuInput.addEventListener('change', function(e) {
+                    var file = e.target.files[0];
+                    if (file) {
+                        mode1QuFile = file;
+                        mode1QuFilename.textContent = file.name;
+                        mode1QuZone.classList.add('border-green-400', 'bg-green-50');
+                        mode1QuZone.classList.remove('border-gray-300');
+                        mode1QuFilename.classList.remove('text-gray-400');
+                        mode1QuFilename.classList.add('text-green-600');
+                    }
+                });
+                mode1QuZone.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    mode1QuZone.classList.add('border-blue-400', 'bg-blue-50');
+                });
+                mode1QuZone.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    if (mode1QuFile) {
+                        mode1QuZone.classList.add('border-green-400', 'bg-green-50');
+                    } else {
+                        mode1QuZone.classList.remove('border-blue-400', 'bg-blue-50');
+                        mode1QuZone.classList.add('border-gray-300');
+                    }
+                });
+                mode1QuZone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    var file = e.dataTransfer.files[0];
+                    if (file) {
+                        mode1QuFile = file;
+                        mode1QuFilename.textContent = file.name;
+                        mode1QuZone.classList.add('border-green-400', 'bg-green-50');
+                        mode1QuZone.classList.remove('border-gray-300', 'border-blue-400');
+                        mode1QuFilename.classList.remove('text-gray-400');
+                        mode1QuFilename.classList.add('text-green-600');
+                    }
+                });
+            }
+
+            var mode1QuStartBtn = document.getElementById('mode1-qu-start');
+            if (mode1QuStartBtn) {
+                mode1QuStartBtn.addEventListener('click', function() {
+                    if (!mode1QuFile) {
+                        alert('请选择命题计划文件');
+                        return;
+                    }
+                    mode1QuStartBtn.disabled = true;
+                    mode1QuStartBtn.textContent = '处理中...';
+                    // 调用已有的导入函数
+                    try {
+                        importObjectivesFromFile(mode1QuFile);
+                        setTimeout(function() {
+                            // 跳转到生成问卷页面
+                            var step1 = document.getElementById('step-1');
+                            var step2 = document.getElementById('step-2');
+                            var step3 = document.getElementById('step-3');
+                            var step4 = document.getElementById('step-4');
+                            if (step1) step1.classList.add('hidden');
+                            if (step2) step2.classList.add('hidden');
+                            if (step3) step3.classList.add('hidden');
+                            if (step4) step4.classList.remove('hidden');
+                            window.scrollTo({top: step4 ? step4.offsetTop - 80 : 0, behavior: 'smooth'});
+                            if (typeof updateMode1Nav === 'function') updateMode1Nav();
+                            mode1QuStartBtn.disabled = false;
+                            mode1QuStartBtn.textContent = '⚡ 一键处理';
+                        }, 2500);
+                    } catch (error) {
+                        alert('处理出错: ' + error.message);
+                        mode1QuStartBtn.disabled = false;
+                        mode1QuStartBtn.textContent = '⚡ 一键处理';
+                    }
+                });
+            }
+
+            var mode1QuResetBtn = document.getElementById('mode1-qu-reset');
+            if (mode1QuResetBtn) {
+                mode1QuResetBtn.addEventListener('click', function() {
+                    mode1QuFile = null;
+                    if (mode1QuInput) mode1QuInput.value = '';
+                    if (mode1QuZone) {
+                        mode1QuZone.classList.remove('border-green-400', 'bg-green-50');
+                        mode1QuZone.classList.add('border-gray-300');
+                    }
+                    if (mode1QuFilename) {
+                        mode1QuFilename.textContent = '点击选择或拖入';
+                        mode1QuFilename.classList.remove('text-green-600');
+                        mode1QuFilename.classList.add('text-gray-400');
+                    }
+                });
+            }
+
+            var mode1QuToggle = document.getElementById('mode1-qu-toggle');
+            if (mode1QuToggle) {
+                mode1QuToggle.addEventListener('click', function() {
+                    var body = document.getElementById('mode1-qu-body');
+                    body.classList.toggle('hidden');
+                    mode1QuToggle.textContent = body.classList.contains('hidden') ? '展开 ▼' : '收起 ▲';
+                });
+            }
+
             // ===== 快捷上传功能 =====
             var quFiles = { objectives: null, audit: null, review: null, daily: null, questionnaire: null };
             var quZones = document.querySelectorAll('.quick-upload-zone');
@@ -3311,6 +3328,7 @@
                 
                 // 提示用户导入成功
                 alert('成功导入 ' + objectives.length + ' 个课程目标');
+                if (typeof updateMode1Nav === 'function') updateMode1Nav();
             }
 
             // 从CSV文件导入学生
@@ -4431,148 +4449,6 @@
                 }
             };
 
-            // ===== 账号系统 =====
-            var ACCOUNTS = [
-                {username: 'user01', password: 'kpT7m2Xq'},
-                {username: 'user02', password: 'vR9wL3pY'},
-                {username: 'user03', password: 'bN5cF8jK'},
-                {username: 'user04', password: 'hZ2qW6sA'},
-                {username: 'user05', password: 'dM8xE4tB'},
-                {username: 'user06', password: 'fG3rU7nV'},
-                {username: 'user07', password: 'yP6kC9oL'},
-                {username: 'user08', password: 'aS1eJ5wD'},
-                {username: 'user09', password: 'tQ4iH2xR'},
-                {username: 'user10', password: 'eW7vO0gF'}
-            ];
-            var MAX_USES = 2;
-            var userRole = null; // 'visitor' | 'user'
-            var currentAccount = null;
-            window.userRole = userRole;
-            window.currentAccount = currentAccount;
-
-            function getUsedCount(account) {
-                var key = 'report_uses_' + account;
-                var val = parseInt(safeStorage.getItem(key)) || 0;
-                return val;
-            }
-
-            function getRemainingUses(account) {
-                return MAX_USES - getUsedCount(account);
-            }
-
-            function decrementUses(account) {
-                var key = 'report_uses_' + account;
-                var newCount = getUsedCount(account) + 1;
-                safeStorage.setItem(key, newCount);
-                return MAX_USES - newCount;
-            }
-
-            function updateUserStatusBadge() {
-                var badge = document.getElementById('user-status-badge');
-                if (!badge) return;
-                if (userRole === 'visitor') {
-                    badge.textContent = '访客模式';
-                    badge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-600';
-                    badge.classList.remove('hidden');
-                } else if (userRole === 'user' && currentAccount) {
-                    var remaining = getRemainingUses(currentAccount);
-                    badge.textContent = '账号: ' + currentAccount + ' | 剩余 ' + remaining + ' 次';
-                    badge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700';
-                    badge.classList.remove('hidden');
-                } else {
-                    badge.classList.add('hidden');
-                }
-            }
-
-            function showWelcomeEntry() {
-                document.getElementById('welcome-entry').classList.remove('hidden');
-                document.getElementById('login-panel').classList.add('hidden');
-                document.getElementById('welcome-mode-select').classList.add('hidden');
-            }
-
-            function showLoginPanel() {
-                document.getElementById('welcome-entry').classList.add('hidden');
-                document.getElementById('login-panel').classList.remove('hidden');
-                document.getElementById('login-error').classList.add('hidden');
-                document.getElementById('login-username').value = '';
-                document.getElementById('login-password').value = '';
-                document.getElementById('login-username').focus();
-            }
-
-            function loginUser() {
-                var username = document.getElementById('login-username').value.trim();
-                var password = document.getElementById('login-password').value.trim();
-                var errorEl = document.getElementById('login-error');
-
-                if (!username || !password) {
-                    errorEl.textContent = '请输入账号和密码';
-                    errorEl.classList.remove('hidden');
-                    return;
-                }
-
-                var matched = ACCOUNTS.filter(function(a) { return a.username === username && a.password === password; });
-                if (matched.length === 0) {
-                    errorEl.textContent = '账号或密码错误';
-                    errorEl.classList.remove('hidden');
-                    return;
-                }
-
-                var remaining = getRemainingUses(username);
-                if (remaining <= 0) {
-                    errorEl.textContent = '该账号报告生成次数已用完（限' + MAX_USES + '次）';
-                    errorEl.classList.remove('hidden');
-                    return;
-                }
-
-                userRole = 'user';
-                currentAccount = username;
-                window.userRole = userRole;
-                window.currentAccount = currentAccount;
-
-                // 显示功能选择
-                document.getElementById('login-panel').classList.add('hidden');
-                document.getElementById('welcome-mode-select').classList.remove('hidden');
-                updateUserStatusBadge();
-            }
-
-            function enterAsVisitor() {
-                userRole = 'visitor';
-                currentAccount = null;
-                window.userRole = userRole;
-                window.currentAccount = currentAccount;
-                document.getElementById('welcome-entry').classList.add('hidden');
-                document.getElementById('welcome-mode-select').classList.remove('hidden');
-                updateUserStatusBadge();
-            }
-
-            function logoutToWelcome() {
-                userRole = null;
-                currentAccount = null;
-                window.userRole = userRole;
-                window.currentAccount = currentAccount;
-                var welcomeScreen = document.getElementById('welcome-screen');
-                var mainContent = document.getElementById('main-content');
-                var backHomeBtn = document.getElementById('back-to-home');
-                var modeBadge = document.getElementById('current-mode-badge');
-                if (welcomeScreen) welcomeScreen.classList.remove('hidden');
-                if (mainContent) mainContent.classList.add('hidden');
-                if (backHomeBtn) backHomeBtn.classList.add('hidden');
-                if (modeBadge) modeBadge.classList.add('hidden');
-                updateUserStatusBadge();
-                showWelcomeEntry();
-                window.scrollTo({top: 0, behavior: 'smooth'});
-            }
-
-            // 暴露到 window
-            window.showLoginPanel = showLoginPanel;
-            window.showWelcomeEntry = showWelcomeEntry;
-            window.loginUser = loginUser;
-            window.enterAsVisitor = enterAsVisitor;
-            window.logoutToWelcome = logoutToWelcome;
-            window.getRemainingUses = getRemainingUses;
-            window.decrementUses = decrementUses;
-            window.updateUserStatusBadge = updateUserStatusBadge;
-
             // ===== 模式切换 =====
             var currentMode = 1; // 默认功能一
             window.currentMode = currentMode;
@@ -4625,6 +4501,10 @@
                     if (step3) step3.classList.add('hidden');
                     if (step5) step5.classList.add('hidden');
 
+                    // 显示功能一快捷上传
+                    var mode1QuickUpload = document.getElementById('mode1-quick-upload');
+                    if (mode1QuickUpload) mode1QuickUpload.classList.remove('hidden');
+
                     // 显示步骤1
                     if (step1) step1.classList.remove('hidden');
                     // 显示步骤4但只显示功能一问卷部分
@@ -4643,6 +4523,7 @@
                     // 更新步骤1按钮文字
                     var toStep2Btn = document.getElementById('to-step-2');
                     if (toStep2Btn) toStep2Btn.textContent = '下一步：生成调查问卷';
+                    updateMode1Nav();
                 } else {
                     // 功能二：生成报告
                     // 隐藏欢迎页，显示主内容
@@ -4665,6 +4546,10 @@
                     if (stepNav) stepNav.classList.remove('hidden');
                     if (quickUpload) quickUpload.classList.remove('hidden');
 
+                    // 隐藏功能一快捷上传
+                    var mode1QuickUpload = document.getElementById('mode1-quick-upload');
+                    if (mode1QuickUpload) mode1QuickUpload.classList.add('hidden');
+
                     // 显示步骤4全部内容，步骤5可见
                     if (step4Intro) step4Intro.classList.remove('hidden');
                     if (step4Controls) step4Controls.classList.remove('hidden');
@@ -4683,26 +4568,65 @@
 
                     // 切换到步骤1
                     showStep(1);
-                    updateUserStatusBadge();
+                    updateMode1Nav();
                 }
             }
             window.switchMode = switchMode;
+
+            function updateMode1Nav() {
+                var mode1Nav = document.getElementById('mode1-nav');
+                if (!mode1Nav) return;
+                if (currentMode !== 1) {
+                    mode1Nav.classList.add('hidden');
+                    return;
+                }
+                mode1Nav.classList.remove('hidden');
+
+                var navBtns = Array.from(mode1Nav.querySelectorAll('.mode1-nav-btn'));
+
+                // 当前激活步骤：step-1可见则为1，step-4可见则为2
+                var step1Visible = !document.getElementById('step-1').classList.contains('hidden');
+                var activeStep = step1Visible ? 1 : 2;
+
+                // 步骤1完成判断：课程目标数 > 0 且有课程名称
+                var objCount = document.querySelectorAll('.objective-item').length;
+                var courseNameEl = document.getElementById('course-name');
+                var courseName = courseNameEl ? courseNameEl.value.trim() : '';
+                var step1Done = objCount > 0 && courseName.length > 0;
+
+                // 步骤2完成判断：问卷已生成
+                var step2Done = !!(window.questionnaireQuestions && window.questionnaireQuestions.length > 0);
+
+                navBtns.forEach(function(btn, idx) {
+                    var stepNum = idx + 1;
+                    // 重置样式
+                    btn.classList.remove('step-completed');
+                    btn.className = 'mode1-nav-btn step-btn px-6 py-3 font-medium ';
+                    if (stepNum === activeStep) {
+                        btn.className += 'text-primary border-b-2 border-primary';
+                    } else {
+                        btn.className += 'text-gray-500 hover:text-primary';
+                    }
+                    if ((stepNum === 1 && step1Done) || (stepNum === 2 && step2Done)) {
+                        btn.classList.add('step-completed');
+                    }
+                });
+            }
+            window.updateMode1Nav = updateMode1Nav;
 
             function backToHome() {
                 var welcomeScreen = document.getElementById('welcome-screen');
                 var mainContent = document.getElementById('main-content');
                 var backHomeBtn = document.getElementById('back-to-home');
                 var modeBadge = document.getElementById('current-mode-badge');
+                var mode1Nav = document.getElementById('mode1-nav');
                 if (welcomeScreen) welcomeScreen.classList.remove('hidden');
                 if (mainContent) mainContent.classList.add('hidden');
                 if (backHomeBtn) backHomeBtn.classList.add('hidden');
                 if (modeBadge) modeBadge.classList.add('hidden');
-                // 重置到功能选择界面（跳过登录）
-                document.getElementById('welcome-entry').classList.add('hidden');
-                document.getElementById('login-panel').classList.add('hidden');
-                var modeSelect = document.getElementById('welcome-mode-select');
-                if (modeSelect) modeSelect.classList.remove('hidden');
-                updateUserStatusBadge();
+                if (mode1Nav) mode1Nav.classList.add('hidden');
+                var mode1QuickUpload = document.getElementById('mode1-quick-upload');
+                if (mode1QuickUpload) mode1QuickUpload.classList.add('hidden');
                 window.scrollTo({top: 0, behavior: 'smooth'});
             }
             window.backToHome = backToHome;
@@ -5082,10 +5006,15 @@
                 if (currentMode === 1) {
                     // 模式1：从课程信息跳转到问卷部分
                     var step1 = document.getElementById('step-1');
+                    var step2 = document.getElementById('step-2');
+                    var step3 = document.getElementById('step-3');
                     var step4 = document.getElementById('step-4');
                     if (step1) step1.classList.add('hidden');
+                    if (step2) step2.classList.add('hidden');
+                    if (step3) step3.classList.add('hidden');
                     if (step4) step4.classList.remove('hidden');
                     window.scrollTo({ top: step4 ? step4.offsetTop - 80 : 0, behavior: 'smooth' });
+                    if (typeof updateMode1Nav === 'function') updateMode1Nav();
                 } else {
                     showStep(2);
                 }
@@ -5253,6 +5182,7 @@
             document.getElementById('add-objective').addEventListener('click', function() {
                 // 延迟添加事件监听器，确保DOM已经更新
                 setTimeout(addObjectiveInputListeners, 100);
+                if (typeof updateMode1Nav === 'function') setTimeout(updateMode1Nav, 150);
             });
 
             // 为计算权重按钮添加点击事件监听器
@@ -6236,10 +6166,11 @@
                                 objectiveWeightSections = step2Content.querySelectorAll('.flex-1.min-w-\[300px\].border.border-gray-200.rounded-md.p-6');
                             }
                         }
+                        if (typeof updateMode1Nav === 'function') updateMode1Nav();
                     });
                 });
             }
-            
+
             // 初始添加删除按钮监听器
             addDeleteObjectiveListeners();
             
@@ -6542,11 +6473,11 @@
                     '重要：本课程的课程目标达成度期望标准值为0.60（即0.6）。所有分析中提到的"预期标准""期望值""达标值"必须使用0.60，不得使用0.7或0.70。判断是否达标的阈值为0.60，达成度≥0.60为达标，<0.60为不达标。\n\n' +
                     '各字段要求：\n' +
                     '- qualitativeAnalysis（定性评价结果分析）必须基于questionnaire字段中的问卷数据，分课程目标逐个分析，每个课程目标单独一段（段落之间用换行符\\n分隔）。每个课程目标的分析要求：\n' +
-                    '  ① 不要完整呈现问卷题目原文，而是提炼题目核心含义，用自己的话概括学生在该目标各维度的掌握情况；\n' +
-                    '  ② 结合问卷数据（如"XX%的学生表示能够…"、"XX%的学生选择完全符合或基本符合"），说明每个维度的达成情况；\n' +
-                    '  ③ 指出负面评价（基本不符合+完全不符合）的比例及其含义；\n' +
+                    '  ① 必须结合该课程目标下每道问卷题目的具体内容进行分析，先简要概括题目考察的核心维度（如"通过本课程的学习，学生是否树立了正确的学生观"），再结合该题的数据（如"XX%的学生选择完全符合或基本符合"）逐一分析；\n' +
+                    '  ② 每道题目的数据要具体引用，包括完全符合占比、基本符合占比、不符合占比等关键数据，说明学生在该维度的达成情况；\n' +
+                    '  ③ 指出负面评价（基本不符合+完全不符合）的具体比例，分析可能原因；\n' +
                     '  ④ 以"整体达成度XX，达成/未达成课程目标N的预期"结尾。\n' +
-                    '  参考示例："课程目标1：通过本课程的学习，90.37%的学生表示树立了"以人为本"的学生观，热爱教育事业，均衡发展各项能力。但仍有8.63%同学缺乏树立正确教育观的意识，不能清楚地意识到教育情怀的重要性。整体达成度较好，达成课程目标1的预期。"\n' +
+                    '  参考示例："课程目标1：本目标包含2道问卷题目。第1题考察学生是否树立了"以人为本"的学生观，调查结果显示90.37%的学生选择"完全符合"或"基本符合"（其中63.16%选择"完全符合"），2.63%的学生选择"基本不符合"或"完全不符合"，说明大部分学生能够树立正确学生观，但仍有少数学生认识不足。第2题考察学生是否热爱教育事业，调查结果显示……整体达成度较好，达成课程目标1的预期。"\n' +
                     '  如果questionnaire为null，则说明"本次未收集问卷数据，定性评价部分仅依据定量考核结果进行初步分析"。\n' +
                     '- problems（存在的问题）必须同时结合定量数据（达成度、合格率等）和定性数据（问卷中负面评价比例等），交叉分析找出问题根源。\n' +
                     '- solutions（持续改进措施）必须针对每个问题给出具体可行的改进措施，同时考虑定量和定性数据的启示。\n' +
@@ -6556,7 +6487,7 @@
                     '{\n' +
                     '  "individualAnalysis": "个体达成情况分析，300-500字，基于定量数据（达成度、学生分布），分析各课程目标达成度、低于0.6的学生比例及教学建议，不要使用问卷数据",\n' +
                     '  "qualitativeIndividualAnalysis": "个体性评价情况分析，300-500字，必须基于问卷数据，分析学生个体对各课程目标的定性评价情况，如问卷为null则说明原因",\n' +
-                    '  "qualitativeAnalysis": "定性评价结果分析，分课程目标逐个分析，每个目标单独一段，提炼问卷题目核心含义并结合数据分析达成情况，不完整呈现题目原文，以达成度结论结尾，如问卷为null则说明原因",\n' +
+                    '  "qualitativeAnalysis": "定性评价结果分析，分课程目标逐个分析，每个目标单独一段，必须结合该目标下每道问卷题目的具体内容和数据进行逐题分析，以达成度结论结尾，如问卷为null则说明原因",\n' +
                     '  "problems": ["问题1，100-200字，结合定量和定性数据", "问题2", "问题3"],\n' +
                     '  "solutions": ["措施1，100-200字，针对上述问题", "措施2", "措施3"],\n' +
                     '  "conclusionText": "达成情况结论，100-200字，描述各目标和总达成度是否达到期望值0.60"\n' +
@@ -7475,14 +7406,14 @@
                                 if (total > 0) { avgPct += positive / total; cnt++; }
                             }
                         });
-                        var pct = cnt > 0 ? (avgPct / cnt * 100).toFixed(2) + '%' : '——';
+                        var pct = cnt > 0 ? (avgPct / cnt).toFixed(3) : '——';
                         html += '<td>' + pct + '</td>';
                         if (cnt > 0) { allAvgPct += avgPct / cnt; allCnt++; }
                     } else {
                         html += '<td>（待填入）</td>';
                     }
                 }
-                html += '<td>' + (allCnt > 0 ? (allAvgPct / allCnt * 100).toFixed(2) + '%' : '——') + '</td></tr>';
+                html += '<td>' + (allCnt > 0 ? (allAvgPct / allCnt).toFixed(3) : '——') + '</td></tr>';
                 
                 // 评价结果
                 html += '<tr><td>评价结果</td>';
@@ -8299,7 +8230,6 @@
 
             // 为生成调查问卷按钮添加事件监听器
             var generateQuestionnaireBtn = document.getElementById('generate-questionnaire');
-            var downloadQuestionnaireBtn = document.getElementById('download-questionnaire');
             var publishQuestionnaireBtn = document.getElementById('publish-questionnaire');
             var questionnairePreview = document.getElementById('questionnaire-preview');
             
@@ -8328,7 +8258,6 @@
                             });
                         }
                         questionnairePreview.classList.remove('hidden');
-                        downloadQuestionnaireBtn.classList.remove('hidden');
                         if (publishQuestionnaireBtn) publishQuestionnaireBtn.classList.remove('hidden');
                         // 添加编辑提示
                         if (!document.getElementById('edit-hint')) {
@@ -8375,15 +8304,6 @@
             function getEditedQuestionnaireHtml() {
                 syncEditedQuestions();
                 return generateQuestionnaireContent();
-            }
-            
-            if (downloadQuestionnaireBtn) {
-                downloadQuestionnaireBtn.addEventListener('click', function() {
-                    var questionnaireHtml = getEditedQuestionnaireHtml();
-                    if (questionnaireHtml) {
-                        downloadQuestionnaire(questionnaireHtml);
-                    }
-                });
             }
             
             // 为导入问卷结果按钮添加事件监听器
@@ -9004,6 +8924,7 @@
                 // 保存问题映射到全局，供导入结果时使用
                 window.questionnaireQuestions = allQuestions;
                 if (typeof updateStepIndicators === 'function') updateStepIndicators();
+                if (typeof updateMode1Nav === 'function') updateMode1Nav();
                 
                 return buildQuestionnaireHtml(allQuestions);
             }
@@ -9516,40 +9437,10 @@
             if (generateReportBtn) {
                 generateReportBtn.addEventListener('click', function() {
                     console.log('生成报告按钮被点击');
-                    
-                    // 访客模式拦截
-                    if (userRole === 'visitor') {
-                        alert('访客模式无法生成报告，请返回首页登录账号后使用。');
-                        return;
-                    }
-                    
-                    // 用户模式：检查剩余次数
-                    if (userRole === 'user' && currentAccount) {
-                        var remaining = getRemainingUses(currentAccount);
-                        if (remaining <= 0) {
-                            alert('您的报告生成次数已用完（每账号限' + MAX_USES + '次）。');
-                            return;
-                        }
-                        if (!confirm('当前账号：' + currentAccount + '\n剩余生成次数：' + remaining + ' 次\n\n确认生成报告？')) {
-                            return;
-                        }
-                    } else {
-                        alert('请先登录后再生成报告。');
-                        return;
-                    }
-                    
                     console.log('generateReport 函数是否存在:', typeof generateReport === 'function');
                     
                     try {
                         generateReport();
-                        // 扣减使用次数
-                        var left = decrementUses(currentAccount);
-                        updateUserStatusBadge();
-                        if (left > 0) {
-                            alert('报告已生成！\n当前账号剩余生成次数：' + left + ' 次');
-                        } else {
-                            alert('报告已生成！\n您的报告生成次数已用完。');
-                        }
                     } catch (error) {
                         alert('生成报告时出错: ' + error.message);
                         console.error('调用 generateReport 出错:', error);
@@ -9585,6 +9476,35 @@
             window.addEventListener('load', function() {
                 console.log('页面加载完成，所有函数已初始化');
                 // 显示欢迎页，不自动进入功能
+                // 监听课程名称变化，更新功能一导航
+                var courseNameInput = document.getElementById('course-name');
+                if (courseNameInput) {
+                    courseNameInput.addEventListener('input', function() { if (typeof updateMode1Nav === 'function') updateMode1Nav(); });
+                }
+                // 功能一导航按钮点击
+                var mode1NavBtns = document.querySelectorAll('.mode1-nav-btn');
+                mode1NavBtns.forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        if (currentMode !== 1) return;
+                        var stepNum = parseInt(this.getAttribute('data-step'));
+                        var step1 = document.getElementById('step-1');
+                        var step4 = document.getElementById('step-4');
+                        if (stepNum === 1) {
+                            if (step4) step4.classList.add('hidden');
+                            if (step1) step1.classList.remove('hidden');
+                            window.scrollTo({top: 0, behavior: 'smooth'});
+                        } else if (stepNum === 2) {
+                            if (step1) step1.classList.add('hidden');
+                            var step2 = document.getElementById('step-2');
+                            var step3 = document.getElementById('step-3');
+                            if (step2) step2.classList.add('hidden');
+                            if (step3) step3.classList.add('hidden');
+                            if (step4) step4.classList.remove('hidden');
+                            window.scrollTo({top: step4 ? step4.offsetTop - 80 : 0, behavior: 'smooth'});
+                        }
+                        if (typeof updateMode1Nav === 'function') updateMode1Nav();
+                    });
+                });
                 // 初始化步骤完成状态
                 setTimeout(function() { if (typeof updateStepIndicators === 'function') updateStepIndicators(); }, 200);
             });
