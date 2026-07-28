@@ -6,14 +6,37 @@
     <title>课程目标达成度分析报告生成系统</title>
     <!-- Tailwind CSS CDN（外部资源） -->
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+        // 屏蔽 Tailwind CDN 生产环境警告
+        var origWarn = console.warn;
+        console.warn = function() {
+            if (arguments[0] && typeof arguments[0] === 'string' && arguments[0].indexOf('should not be used in production') !== -1) return;
+            origWarn.apply(console, arguments);
+        };
+    </script>
     <!-- Chart.js CDN（外部资源） -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
     <!-- Mammoth.js 用于解析DOC/DOCX文件 -->
-    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/build/mammoth.browser.min.js"></script>
+    <script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
+    <script>
+        if (typeof mammoth === 'undefined') {
+            document.write('<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/lib/index.js"><\/script>');
+        }
+    </script>
     <!-- SheetJS 用于解析Excel文件 -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script>
+        if (typeof XLSX === 'undefined') {
+            document.write('<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>');
+        }
+    </script>
     <!-- QRCode.js 用于生成问卷发布二维码 -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script>
+        if (typeof QRCode === 'undefined') {
+            document.write('<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"><\/script>');
+        }
+    </script>
     <!-- 自定义Tailwind配置，设置全局样式 -->
     <script>
         tailwind.config = {
@@ -359,6 +382,9 @@
                 </div>
 
                 <div class="flex justify-end mt-8 space-x-4">
+                    <button id="import-objectives" class="border-2 border-red-500 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors">
+                        导入命题计划
+                    </button>
                     <input type="file" id="objectives-file" accept=".csv,.doc,.docx,.xlsx,.xls" class="hidden">
                     <button id="add-objective" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors">
                         添加课程目标
@@ -1544,9 +1570,12 @@
                     objectivesFileInput.addEventListener('change', function(e) {
                         var file = e.target.files[0];
                         if (file) {
+                            console.log('导入命题计划文件:', file.name, '大小:', file.size);
                             importObjectivesFromFile(file);
                         }
                     });
+                } else {
+                    console.error('导入命题计划按钮或文件输入未找到:', !!importObjectivesBtn, !!objectivesFileInput);
                 }
                 
                 // 为导入学生按钮添加点击事件监听器
@@ -1627,6 +1656,17 @@
             // 导入命题计划（课程目标）
             function importObjectivesFromFile(file) {
                 var fileName = file.name.toLowerCase();
+                console.log('开始导入命题计划:', fileName);
+                
+                // 检查库是否加载
+                if (typeof mammoth === 'undefined' && (fileName.endsWith('.doc') || fileName.endsWith('.docx'))) {
+                    alert('文档解析库未加载，可能是网络问题。请检查网络连接后刷新页面重试，或使用CSV/XLSX格式文件。');
+                    return;
+                }
+                if (typeof XLSX === 'undefined' && (fileName.endsWith('.xlsx') || fileName.endsWith('.xls'))) {
+                    alert('Excel解析库未加载，可能是网络问题。请检查网络连接后刷新页面重试，或使用CSV格式文件。');
+                    return;
+                }
                 
                 // 判断文件类型
                 if (fileName.endsWith('.doc')) {
@@ -1876,9 +1916,11 @@
                     ]).then(function(results) {
                         var rawText = results[0].value;
                         var html = results[1].value;
+                        console.log('DOCX解析完成，文本长度:', rawText.length, '前200字:', rawText.substring(0, 200));
                         
                         // 从文本中提取课程信息和课程目标
                         var data = parseObjectivesFromText(rawText);
+                        console.log('解析结果:', data);
                         
                         // 如果纯文本解析结果不足，尝试从HTML表格中补充提取
                         var tableData = parseHtmlTables(html);
@@ -2049,9 +2091,8 @@
                         /授课班级[：:]\s*([^\s,，;；\n]+)/,
                         /教学班[：:]\s*([^\s,，;；\n]+)/,
                         /班级名称[：:]\s*([^\s,，;；\n]+)/,
-                        /考核年级[、，:：]\s*(\d{4}级)/,
-                        /年级[：:]\s*([^\s,，;；\n]+)/,
-                        /(\d{4}级)/
+                        /考核班级[：:]\s*([^\s,，;；\n]+)/,
+                        /(\d{4}级[\u4e00-\u9fff][^\s,，;；\n]*班)/
                     ],
                     studentCount: [
                         /学生人数[：:]\s*(\d+)/,
@@ -2072,12 +2113,13 @@
                         /教师[：:]\s*([^\s,，;；\n]+)/
                     ],
                     major: [
-                        /专业[：:]\s*([^\s,，;；\n]+)/,
-                        /授课专业[：:]\s*([^\s,，;；\n]+)/,
-                        /学科[：:]\s*([^\s,，;；\n]+)/,
-                        /专业名称[：:]\s*([^\s,，;；\n]+)/,
                         /适用专业[：:]\s*([^\s,，;；\n]+)/,
-                        /考核年级[、，:：]\s*\d{4}级\s*([^\s,，;；\n]+)/
+                        /授课专业[：:]\s*([^\s,，;；\n]+)/,
+                        /专业名称[：:]\s*([^\s,，;；\n]+)/,
+                        /开课专业[：:]\s*([^\s,，;；\n]+)/,
+                        /所属专业[：:]\s*([^\s,，;；\n]+)/,
+                        /学科[：:]\s*([^\s,，;；\n]+)/,
+                        /专业[：:]\s*([^\s,，;；\n]+)/
                     ]
                 };
                 
@@ -2085,10 +2127,44 @@
                     for (var i = 0; i < patterns[key].length; i++) {
                         var match = line.match(patterns[key][i]);
                         if (match) {
-                            info[key] = match[1].trim();
+                            var value = match[1].trim();
+                            // 课程名称字段：去除试卷序号、开课单位等无关内容
+                            if (key === 'courseName') {
+                                value = value.replace(/(试卷序号|开课单位|适用专业|考试时间|命题日期|审核日期|制表日期|日期).*/g, '').trim();
+                                value = value.replace(/[\s,，;；|、。]+$/, '').trim();
+                                if (!value) continue;
+                            }
+                            // 评价人字段：去除日期、时间等无关内容
+                            if (key === 'evaluator') {
+                                value = value.replace(/(考试时间|命题日期|审核日期|制表日期|日期).*/g, '').trim();
+                                value = value.replace(/\d{4}[年\-\/.]\d{1,2}[月\-\/.]\d{1,2}[日]?/g, '').trim();
+                                value = value.replace(/\d{1,2}[:：]\d{2}/g, '').trim();
+                                value = value.replace(/[\s,，;；|、。]+$/, '').trim();
+                                if (!value) continue;
+                            }
+                            info[key] = value;
                             break;
                         }
                     }
+                }
+                
+                // 后处理：班级和专业互斥清理
+                if (info.className && info.className.indexOf('专业') !== -1 && !info.major) {
+                    var majorMatch = info.className.match(/([\u4e00-\u9fff]+专业)/);
+                    if (majorMatch) info.major = majorMatch[1];
+                }
+                if (info.className) {
+                    var classEnd = info.className.indexOf('班');
+                    if (classEnd !== -1) info.className = info.className.substring(0, classEnd + 1);
+                    info.className = info.className.replace(/[\s,，;；|、。]+$/, '').trim();
+                }
+                if (info.major) {
+                    info.major = info.major.replace(/\d{4}级/, '').replace(/班$/, '').trim();
+                    info.major = info.major.replace(/[\d.]+\s*$/, '').trim();
+                    info.major = info.major.replace(/[\s,，;；|、。]+$/, '').trim();
+                }
+                if (info.className && info.major && info.className === info.major) {
+                    info.major = '';
                 }
                 
                 return Object.keys(info).length > 0 ? info : null;
@@ -3084,10 +3160,8 @@
                         /授课班级[：:]\s*([^\n,，;；|]+)/,
                         /教学班[：:]\s*([^\n,，;；|]+)/,
                         /班级名称[：:]\s*([^\n,，;；|]+)/,
-                        /班级[：:]\s*(\d{4}级[^\n,，;；|]*)/,
-                        /考核年级[、，].*?[：:]\s*(\d{4}级)/,
-                        /(\d{4}级[^\n,，;；|]*)/,
-                        /年级[：:]\s*([^\n,，;；|]+)/
+                        /考核班级[：:]\s*([^\n,，;；|]+)/,
+                        /(\d{4}级[\u4e00-\u9fff][^\n,，;；|]*班)/
                     ],
                     studentCount: [
                         /学生人数[：:]\s*(\d+)/,
@@ -3108,10 +3182,11 @@
                         /教师[：:]\s*([^\n,，;；|]+)/
                     ],
                     major: [
-                        /考核年级[、，].*?[：:]\s*\d{4}级\s*([^\n,，;；|]+)/,
                         /适用专业[：:]\s*([^\n,，;；|]+)/,
                         /授课专业[：:]\s*([^\n,，;；|]+)/,
                         /专业名称[：:]\s*([^\n,，;；|]+)/,
+                        /开课专业[：:]\s*([^\n,，;；|]+)/,
+                        /所属专业[：:]\s*([^\n,，;；|]+)/,
                         /学科[：:]\s*([^\n,，;；|]+)/,
                         /专业[：:]\s*([^\n,，;；|]+)/
                     ]
@@ -3122,10 +3197,60 @@
                     for (var i = 0; i < patterns[key].length; i++) {
                         var match = text.match(patterns[key][i]);
                         if (match) {
-                            info[key] = match[1].trim();
+                            var value = match[1].trim();
+                            // 课程名称字段：去除试卷序号、开课单位等无关内容
+                            if (key === 'courseName') {
+                                value = value.replace(/(试卷序号|开课单位|适用专业|考试时间|命题日期|审核日期|制表日期|日期).*/g, '').trim();
+                                value = value.replace(/[\s,，;；|、。]+$/, '').trim();
+                                if (!value) continue;
+                            }
+                            // 评价人字段：去除日期、时间等无关内容
+                            if (key === 'evaluator') {
+                                // 去除"考试时间""命题日期"等关键词及其后面的内容
+                                value = value.replace(/(考试时间|命题日期|审核日期|制表日期|日期).*/g, '').trim();
+                                // 去除日期格式（如2024年1月10日、2024-01-10等）
+                                value = value.replace(/\d{4}[年\-\/.]\d{1,2}[月\-\/.]\d{1,2}[日]?/g, '').trim();
+                                // 去除时间格式（如14:30）
+                                value = value.replace(/\d{1,2}[:：]\d{2}/g, '').trim();
+                                // 去除末尾的标点符号
+                                value = value.replace(/[\s,，;；|、。]+$/, '').trim();
+                                // 如果清理后为空，跳过
+                                if (!value) continue;
+                            }
+                            info[key] = value;
                             break;
                         }
                     }
+                }
+                
+                // 后处理：班级和专业互斥清理
+                // 如果班级中包含了"专业"关键词，可能是误识别，从中提取专业
+                if (info.className && info.className.indexOf('专业') !== -1 && !info.major) {
+                    var majorMatch = info.className.match(/([\u4e00-\u9fff]+专业)/);
+                    if (majorMatch) {
+                        info.major = majorMatch[1];
+                    }
+                }
+                // 班级只保留到"班"字为止，去除后面的无关内容
+                if (info.className) {
+                    var classEnd = info.className.indexOf('班');
+                    if (classEnd !== -1) {
+                        info.className = info.className.substring(0, classEnd + 1);
+                    }
+                    // 去除末尾标点
+                    info.className = info.className.replace(/[\s,，;；|、。]+$/, '').trim();
+                }
+                // 专业去除"班""级"等班级相关内容，去除末尾的数字（如"1.2"）
+                if (info.major) {
+                    info.major = info.major.replace(/\d{4}级/, '').replace(/班$/, '').trim();
+                    // 去除末尾的数字和小数点（如"数学与应用数学1.2"→"数学与应用数学"）
+                    info.major = info.major.replace(/[\d.]+\s*$/, '').trim();
+                    // 去除末尾标点
+                    info.major = info.major.replace(/[\s,，;；|、。]+$/, '').trim();
+                }
+                // 如果班级和专业相同，清空专业（避免重复）
+                if (info.className && info.major && info.className === info.major) {
+                    info.major = '';
                 }
                 
                 return info;
@@ -3164,6 +3289,12 @@
                     
                     // 去除描述开头可能的序号前缀（如"1."、"2."）
                     desc = desc.replace(/^\d+[.\uff0e、]\s*/, '');
+                    
+                    // 去除"目标N："或"课程目标N："等前缀，只保留冒号后面的内容
+                    desc = desc.replace(/^(课程)?目标\s*\d+\s*[：:]\s*/, '');
+                    
+                    // 去除描述开头可能残留的其他前缀（如"目标描述："）
+                    desc = desc.replace(/^.*?目标.*?[：:]\s*/, '');
                     
                     // 规范化毕业要求字段：去除残留的"]"右方括号
                     requirement = requirement.replace(/\]/g, '');
@@ -3445,8 +3576,8 @@
                             if (inputs.length >= 4) {
                                 inputs[0].value = className;
                                 inputs[1].value = name;
-                                inputs[2].value = dailyScore;
-                                inputs[3].value = examScore;
+                                inputs[2].value = Math.round(dailyScore);
+                                inputs[3].value = Math.round(examScore);
                                 
                                 // 填充题目得分（如果有）
                                 for (var j = questionStartIdx, k = 4; j < cells.length && k < inputs.length; j++, k++) {
@@ -3530,7 +3661,7 @@
                         inputs[0].value = student.className || '';
                         inputs[1].value = student.name || '';
                         inputs[2].value = '';  // 平时成绩，评阅文档不含此数据
-                        inputs[3].value = student.examScore || 0;
+                        inputs[3].value = Math.round(student.examScore || 0);
                         
                         // 填充每小题得分
                         if (student.questionScores && student.questionScores.length > 0) {
@@ -4175,7 +4306,49 @@
                         var workbook = XLSX.read(data, {type: 'array'});
                         var sheetName = workbook.SheetNames[0];
                         var sheet = workbook.Sheets[sheetName];
-                        var jsonRows = XLSX.utils.sheet_to_json(sheet, {header: 1, defval: ''});
+                        var jsonRows = XLSX.utils.sheet_to_json(sheet, {header: 1, defval: '', raw: true});
+                        
+                        // 处理合并单元格：将合并区域的值填充到所有子单元格
+                        if (sheet['!merges']) {
+                            sheet['!merges'].forEach(function(merge) {
+                                var startRow = merge.s.r;
+                                var endRow = merge.e.r;
+                                var startCol = merge.s.c;
+                                var endCol = merge.e.c;
+                                // 获取合并区域的值（左上角单元格）
+                                var cellRef = XLSX.utils.encode_cell({r: startRow, c: startCol});
+                                var cellObj = sheet[cellRef];
+                                var cellValue = cellObj ? (cellObj.w !== undefined ? cellObj.w : String(cellObj.v || '')) : '';
+                                // 填充到所有子单元格
+                                for (var r = startRow; r <= endRow; r++) {
+                                    for (var c = startCol; c <= endCol; c++) {
+                                        if (r === startRow && c === startCol) continue;
+                                        if (!jsonRows[r]) jsonRows[r] = [];
+                                        if (!jsonRows[r][c] || jsonRows[r][c] === '') {
+                                            jsonRows[r][c] = cellValue;
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                        
+                        // 处理公式单元格：sheet_to_json 可能返回公式字符串而非计算值
+                        // 从 sheet 对象中直接读取缓存的计算值
+                        var range = XLSX.utils.decode_range(sheet['!ref']);
+                        for (var r = range.s.r; r <= range.e.r; r++) {
+                            for (var c = range.s.c; c <= range.e.c; c++) {
+                                var cellRef2 = XLSX.utils.encode_cell({r: r, c: c});
+                                var cellObj2 = sheet[cellRef2];
+                                if (cellObj2 && cellObj2.f !== undefined) {
+                                    // 这是一个公式单元格，使用缓存值 v 或格式化值 w
+                                    var cachedVal = cellObj2.v !== undefined ? cellObj2.v : (cellObj2.w !== undefined ? parseFloat(cellObj2.w) : '');
+                                    if (!jsonRows[r]) jsonRows[r] = [];
+                                    if (typeof cachedVal === 'number' || (typeof cachedVal === 'string' && cachedVal && !isNaN(parseFloat(cachedVal)))) {
+                                        jsonRows[r][c] = typeof cachedVal === 'number' ? cachedVal : parseFloat(cachedVal);
+                                    }
+                                }
+                            }
+                        }
                         
                         var result = parseDailyScoreRows(jsonRows);
                         fillDailyScores(result.scores, result.nameColIndex, result.componentNames, result.componentScores);
@@ -4243,8 +4416,8 @@
                     
                     for (var c = 0; c < row.length; c++) {
                         var cellText = String(row[c] || '').replace(/\n/g, ' ').trim();
-                        // 精确匹配"姓名"列（排除"学生姓名"等含其他前缀的）
-                        if (cellText === '姓名' && rowNameCol === -1) {
+                        // 匹配姓名列（精确匹配或包含"姓名"）
+                        if ((cellText === '姓名' || cellText === '学生姓名' || cellText === 'name' || cellText === 'Name') && rowNameCol === -1) {
                             rowNameCol = c;
                         }
                         if (cellText.indexOf('平时成绩') !== -1 && rowDailyCol === -1) {
@@ -4272,13 +4445,28 @@
                     var headerRow = jsonRows[headerRowIndex];
                     for (var c = 0; c < headerRow.length; c++) {
                         var cellText = String(headerRow[c] || '').replace(/\n/g, ' ').trim();
-                        if (cellText.indexOf('总评') !== -1 || cellText.indexOf('总分') !== -1 || 
-                            cellText.indexOf('总成绩') !== -1 || cellText.indexOf('合计') !== -1) {
+                        // 精确匹配优先
+                        if (cellText === '成绩' || cellText === '平时成绩' || cellText === '平时分' ||
+                            cellText === '总评' || cellText === '总分' || cellText === '总成绩' || cellText === '合计') {
                             dailyScoreColIndex = c;
                             break;
                         }
                     }
+                    // 模糊匹配
+                    if (dailyScoreColIndex === -1) {
+                        for (var c2 = 0; c2 < headerRow.length; c2++) {
+                            var ct = String(headerRow[c2] || '').replace(/\n/g, ' ').trim();
+                            if (ct.indexOf('平时') !== -1 || ct.indexOf('总评') !== -1 || 
+                                ct.indexOf('总分') !== -1 || ct.indexOf('总成绩') !== -1 || 
+                                ct.indexOf('合计') !== -1 || ct === '成绩') {
+                                dailyScoreColIndex = c2;
+                                break;
+                            }
+                        }
+                    }
                 }
+                
+                console.log('平时成绩表头解析: headerRowIndex=' + headerRowIndex + ', nameColIndex=' + nameColIndex + ', dailyScoreColIndex=' + dailyScoreColIndex);
                 
                 if (headerRowIndex === -1 || nameColIndex === -1 || dailyScoreColIndex === -1) {
                     return { scores: scores, nameColIndex: nameColIndex, componentNames: componentNames, componentScores: componentScores };
@@ -4367,6 +4555,46 @@
                 var matchedCount = 0;
                 var unmatchedNames = [];
                 
+                // 规范化姓名：去除所有空格、不可见字符、全半角差异
+                function normalizeName(name) {
+                    if (!name) return '';
+                    return String(name)
+                        .replace(/\s+/g, '')           // 所有空白
+                        .replace(/[\u3000]/g, '')       // 全角空格
+                        .replace(/[\uFEFF]/g, '')       // BOM
+                        .replace(/[\u200B-\u200D]/g, '') // 零宽空格类
+                        .replace(/[\u00AD]/g, '')        // 软连字符
+                        .replace(/[\u2060]/g, '')        // 零宽不间断空格
+                        .replace(/[\u2028\u2029]/g, '')  // 行分隔符
+                        .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '') // 控制字符
+                        .replace(/\u00A0/g, '')          // 不间断空格
+                        .trim();
+                }
+                
+                // 构建规范化后的姓名映射
+                var normalizedScores = {};
+                var normalizedComponentScores = {};
+                for (var key in scores) {
+                    normalizedScores[normalizeName(key)] = scores[key];
+                }
+                for (var key in componentScores) {
+                    normalizedComponentScores[normalizeName(key)] = componentScores[key];
+                }
+                
+                console.log('平时成绩表解析结果:', JSON.stringify(scores));
+                console.log('规范化后姓名列表:', Object.keys(normalizedScores));
+                console.log('成绩录入表行数:', studentRows.length);
+                
+                // 调试：打印所有学生姓名
+                var debugNames = [];
+                studentRows.forEach(function(row) {
+                    var inputs = row.querySelectorAll('input');
+                    if (inputs.length >= 2 && inputs[1].value.trim()) {
+                        debugNames.push(inputs[1].value.trim() + '→' + normalizeName(inputs[1].value.trim()));
+                    }
+                });
+                console.log('评阅文档学生姓名:', debugNames.join(', '));
+                
                 studentRows.forEach(function(row) {
                     var inputs = row.querySelectorAll('input');
                     if (inputs.length < 4) return;
@@ -4375,11 +4603,20 @@
                     var studentName = inputs[1].value.trim();
                     if (!studentName) return;
                     
-                    if (scores.hasOwnProperty(studentName)) {
-                        inputs[2].value = scores[studentName];
+                    var normalizedName = normalizeName(studentName);
+                    
+                    if (normalizedScores.hasOwnProperty(normalizedName)) {
+                        inputs[2].value = Math.round(normalizedScores[normalizedName]);
                         matchedCount++;
                     } else {
-                        unmatchedNames.push(studentName);
+                        // 尝试去掉"同学"后缀
+                        var nameNoSuffix = normalizedName.replace(/同学$/, '');
+                        if (normalizedScores.hasOwnProperty(nameNoSuffix)) {
+                            inputs[2].value = Math.round(normalizedScores[nameNoSuffix]);
+                            matchedCount++;
+                        } else {
+                            unmatchedNames.push(studentName);
+                        }
                     }
                 });
                 
@@ -5632,16 +5869,6 @@
                 if (!chart) return;
                 
                 try {
-                    // 设置图表尺寸为14×8厘米（转换为像素，1cm ≈ 37.8px）
-                    var width = 14 * 37.8;
-                    var height = 8 * 37.8;
-                    
-                    chart.canvas.width = width;
-                    chart.canvas.height = height;
-                    
-                    // 重新绘制图表以适应新尺寸
-                    chart.update();
-                    
                     // 获取图表的base64图片
                     var image = chart.toBase64Image('image/png', 1.0);
                     
@@ -6821,16 +7048,11 @@
                 if (window.objectivesChart) {
                     console.log('获取课程目标图表');
                     try {
-                        // 强制设置canvas尺寸并重新渲染，确保图表已正确绘制
-                        var objChart = window.objectivesChart;
-                        objChart.canvas.width = Math.round(14 * 37.8);
-                        objChart.canvas.height = Math.round(8 * 37.8);
-                        objChart.update('none');
-                        var objectivesChartImage = objChart.toBase64Image('image/png', 1.0);
+                        var objectivesChartImage = window.objectivesChart.toBase64Image('image/png', 1.0);
                         console.log('成功获取课程目标图表base64, 长度:', objectivesChartImage.length);
                         objectivesChartHtml = `
-                        <div class="text-center my-6" style="width: 8cm; margin: 0 auto;">
-                            <img src="${objectivesChartImage}" alt="课程目标支撑指标点达成情况" style="width: 8cm; height: 14cm; object-fit: fill; display: block; margin: 0 auto; page-break-inside: avoid;">
+                        <div class="text-center my-6" style="margin: 0 auto;">
+                            <img src="${objectivesChartImage}" alt="课程目标支撑指标点达成情况" style="width: 6.72cm; height: 12cm; display: block; margin: 0 auto; page-break-inside: avoid;">
                             <h5>图2-1 课程目标支撑指标点达成情况</h5>
                         </div>
                         `;
@@ -6849,15 +7071,11 @@
                     window.individualCharts.forEach(function(chart, index) {
                         if (chart) {
                             try {
-                                // 强制设置canvas尺寸并重新渲染
-                                chart.canvas.width = Math.round(14 * 37.8);
-                                chart.canvas.height = Math.round(8 * 37.8);
-                                chart.update('none');
                                 var individualChartImage = chart.toBase64Image('image/png', 1.0);
                                 console.log('成功获取课程目标', index + 1, '图表base64, 长度:', individualChartImage.length);
                                 individualChartsHtml += `
-                                <div class="text-center my-6" style="width: 14cm; margin: 0 auto;">
-                                    <img src="${individualChartImage}" alt="课程目标${index + 1}达成情况" style="width: 14cm; height: 8cm; object-fit: contain; display: block; margin: 0 auto; page-break-inside: avoid;">
+                                <div class="text-center my-6" style="margin: 0 auto;">
+                                    <img src="${individualChartImage}" alt="课程目标${index + 1}达成情况" style="width: 6.72cm; height: 12cm; display: block; margin: 0 auto; page-break-inside: avoid;">
                                     <h5>图2-2-${index + 1} 课程目标${index + 1}达成情况</h5>
                                 </div>
                                 `;
@@ -7163,6 +7381,8 @@
                     var hasResults = window.questionnaireResults && window.questionnaireResults.questions && window.questionnaireResults.questions.length > 0;
                     var currentObj = -1;
                     window.questionnaireQuestions.forEach(function(q) {
+                        // 跳过设为"无"的问题
+                        if (q.objectiveIndex === -1) return;
                         if (q.objectiveIndex !== currentObj) {
                             currentObj = q.objectiveIndex;
                             if (currentObj > 0) {
@@ -8019,6 +8239,20 @@
                 // 构建表头（两行，使用合并单元格）
                 var headerHTML = '';
                 if (hasDailyComponents) {
+                    // 将构成列按名称分组（如3个"课程作业"合并为一个标题）
+                    var dailyGroups = []; // {name, count}
+                    dailyComponents.names.forEach(function(name) {
+                        // 提取基础名称（去掉括号内容，如"课程作业（60%）"→"课程作业"）
+                        var baseName = name.replace(/[（(].*$/, '').trim();
+                        var lastGroup = dailyGroups[dailyGroups.length - 1];
+                        if (lastGroup && lastGroup.baseName === baseName) {
+                            lastGroup.count++;
+                            lastGroup.names.push(name);
+                        } else {
+                            dailyGroups.push({ baseName: baseName, displayName: name, count: 1, names: [name] });
+                        }
+                    });
+                    
                     var dailyColCount = 1 + dailyComponents.names.length; // 总分 + 构成列
                     var examColCount = 1 + examHeaders.length; // 总分 + 题目列
                     headerHTML = '<thead><tr>' +
@@ -8030,8 +8264,13 @@
                         '</tr><tr>';
                     // 平时成绩子表头
                     headerHTML += '<th>总分</th>';
-                    dailyComponents.names.forEach(function(name) {
-                        headerHTML += '<th>' + name + '</th>';
+                    dailyGroups.forEach(function(group) {
+                        if (group.count > 1) {
+                            // 同名构成列合并为一个跨列表头
+                            headerHTML += '<th colspan="' + group.count + '">' + group.displayName + '</th>';
+                        } else {
+                            headerHTML += '<th>' + group.displayName + '</th>';
+                        }
                     });
                     // 考试成绩子表头
                     headerHTML += '<th>总分</th>';
@@ -8060,9 +8299,11 @@
                 var studentRows = studentsTableBody.querySelectorAll('tr');
                 var dataRowsHTML = '<tbody>';
                 var componentSums = {};
+                var componentCounts = {};
                 if (hasDailyComponents) {
                     dailyComponents.names.forEach(function(name) {
                         componentSums[name] = 0;
+                        componentCounts[name] = 0;
                     });
                 }
                 var dailyTotalSum = 0, examTotalSum = 0;
@@ -8073,12 +8314,14 @@
                 studentRows.forEach(function(row, index) {
                     var inputs = row.querySelectorAll('input');
                     if (inputs.length < 4) return;
+                    // 跳过姓名为空的行
+                    if (!inputs[1].value.trim()) return;
                     studentCount++;
                     
                     var seqSpan = row.querySelector('.student-seq');
                     var studentName = inputs[1].value || '未命名';
-                    var dailyScore = inputs[2].value || '0';
-                    var examScore = inputs[3].value || '0';
+                    var dailyScore = Math.round(parseFloat(inputs[2].value) || 0);
+                    var examScore = Math.round(parseFloat(inputs[3].value) || 0);
                     
                     dailyTotalSum += parseFloat(dailyScore) || 0;
                     examTotalSum += parseFloat(examScore) || 0;
@@ -8091,13 +8334,15 @@
                     if (hasDailyComponents) {
                         // 平时成绩总分
                         dataRowsHTML += '<td>' + dailyScore + '</td>';
-                        // 平时成绩构成
-                        var compScores = dailyComponents.scores[studentName] || {};
+                        // 平时成绩构成 — 用规范化姓名匹配
+                        var normalizedName = String(studentName).replace(/\s+/g, '').replace(/[\u3000\uFEFF]/g, '').trim();
+                        var compScores = dailyComponents.scores[normalizedName] || dailyComponents.scores[studentName] || {};
                         dailyComponents.names.forEach(function(name) {
                             var val = compScores[name] !== undefined ? compScores[name] : '';
-                            dataRowsHTML += '<td>' + val + '</td>';
+                            dataRowsHTML += '<td>' + (val === '' ? '' : Math.round(parseFloat(val) || 0)) + '</td>';
                             if (typeof val === 'number' || (typeof val === 'string' && val !== '' && !isNaN(parseFloat(val)))) {
                                 componentSums[name] += parseFloat(val) || 0;
+                                componentCounts[name] += 1;
                             }
                         });
                         // 考试成绩总分
@@ -8124,17 +8369,18 @@
                 var footerHTML = '<tfoot><tr>';
                 footerHTML += '<td colspan="3" style="white-space:nowrap;word-break:keep-all;text-align:center;">各项成绩平均分</td>';
                 if (hasDailyComponents) {
-                    footerHTML += '<td>' + (studentCount > 0 ? (dailyTotalSum / studentCount).toFixed(1) : '0') + '</td>';
+                    footerHTML += '<td>' + (studentCount > 0 ? Math.round(dailyTotalSum / studentCount) : 0) + '</td>';
                     dailyComponents.names.forEach(function(name) {
-                        footerHTML += '<td>' + (studentCount > 0 ? (componentSums[name] / studentCount).toFixed(1) : '0') + '</td>';
+                        var cnt = componentCounts[name] || 0;
+                        footerHTML += '<td>' + (cnt > 0 ? Math.round(componentSums[name] / cnt) : 0) + '</td>';
                     });
-                    footerHTML += '<td>' + (studentCount > 0 ? (examTotalSum / studentCount).toFixed(1) : '0') + '</td>';
+                    footerHTML += '<td>' + (studentCount > 0 ? Math.round(examTotalSum / studentCount) : 0) + '</td>';
                 } else {
-                    footerHTML += '<td>' + (studentCount > 0 ? (dailyTotalSum / studentCount).toFixed(1) : '0') + '</td>';
-                    footerHTML += '<td>' + (studentCount > 0 ? (examTotalSum / studentCount).toFixed(1) : '0') + '</td>';
+                    footerHTML += '<td>' + (studentCount > 0 ? Math.round(dailyTotalSum / studentCount) : 0) + '</td>';
+                    footerHTML += '<td>' + (studentCount > 0 ? Math.round(examTotalSum / studentCount) : 0) + '</td>';
                 }
                 examQuestionSums.forEach(function(sum) {
-                    footerHTML += '<td>' + (studentCount > 0 ? (sum / studentCount).toFixed(1) : '0') + '</td>';
+                    footerHTML += '<td>' + (studentCount > 0 ? Math.round(sum / studentCount) : 0) + '</td>';
                 });
                 footerHTML += '</tr></tfoot>';
                 
@@ -8716,6 +8962,7 @@
                         html += '<option value="' + oi + '"' + (defaultObj === oi ? ' selected' : '') + '>课程目标' + oi + '</option>';
                     }
                     html += '<option value="0"' + (defaultObj === 0 ? ' selected' : '') + '>综合评价</option>';
+                    html += '<option value="-1"' + (defaultObj === -1 ? ' selected' : '') + '>无（不列入分析）</option>';
                     html += '</select></td>';
                     html += '</tr>';
                 });
@@ -8734,20 +8981,26 @@
                     var selects = body.querySelectorAll('.qmapping-select');
                     var scaleOptions = ['A、完全符合', 'B、基本符合', 'C、一般', 'D、基本不符合', 'E、完全不符合'];
                     var allQuestions = [];
+                    var excludedCount = 0;
                     selects.forEach(function(sel, i) {
+                        var objIdx = parseInt(sel.value);
+                        if (objIdx === -1) excludedCount++;
                         allQuestions.push({
                             num: i + 1,
                             text: questions[i].text,
-                            objectiveIndex: parseInt(sel.value),
+                            objectiveIndex: objIdx,
                             type: 'single',
                             options: scaleOptions
                         });
                     });
                     window.questionnaireQuestions = allQuestions;
                     window.questionnaireMappingDone = true;
-                    console.log('[问卷映射] 用户手动映射完成，共' + allQuestions.length + '题');
+                    console.log('[问卷映射] 用户手动映射完成，共' + allQuestions.length + '题，其中' + excludedCount + '题设为"无"');
                     closeModal();
-                    alert('映射完成！\n有效问卷：' + totalResponses + ' 份\n问题数量：' + questions.length + ' 个\n\n现在生成分析报告将包含定性评价结果分析。');
+                    var msg = '映射完成！\n有效问卷：' + totalResponses + ' 份\n问题数量：' + questions.length + ' 个';
+                    if (excludedCount > 0) msg += '\n其中 ' + excludedCount + ' 题设为"无"，不列入分析。';
+                    msg += '\n\n现在生成分析报告将包含定性评价结果分析。';
+                    alert(msg);
                     if (typeof updateStepIndicators === 'function') updateStepIndicators();
                 }
                 
